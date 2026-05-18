@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Settings } from "lucide-react"
 import { PharmacyDefaults } from "@/types"
 import { getPharmacyDefaults, savePharmacyDefaults } from "@/lib/pharmacy-storage"
@@ -31,12 +31,10 @@ const emptyDefaults: PharmacyDefaults = {
 }
 
 export function PharmacySettings() {
-  const [data, setData] = useState<PharmacyDefaults>(emptyDefaults)
-
-  useEffect(() => {
+  const [data, setData] = useState<PharmacyDefaults>(() => {
     const saved = getPharmacyDefaults()
-    if (saved) setData(saved)
-  }, [])
+    return saved ?? emptyDefaults
+  })
 
   function handleChange(field: keyof PharmacyDefaults, value: string) {
     setData((prev) => ({ ...prev, [field]: value }))
