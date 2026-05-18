@@ -1,0 +1,969 @@
+[
+  {
+    "id": "01",
+    "name": "Acne (Mild)",
+    "slug": "acne",
+    "symptoms": [
+      "Comedones (blackheads/whiteheads)",
+      "Few papules and pustules",
+      "Face, chest, or back distribution",
+      "No nodules, cysts, or scarring"
+    ],
+    "redFlags": [
+      "Nodules, cysts, or scarring (moderate–severe)",
+      "Sudden severe onset",
+      "Signs of hyperandrogenism: hirsutism, irregular menses, infertility",
+      "Drug-induced acne (steroids, lithium, etc.)",
+      "Significant psychological distress",
+      "No improvement after 2–3 months of treatment"
+    ],
+    "rxOptions": [
+      {
+        "drug": "Benzoyl peroxide 2.5–5%",
+        "dose": "Apply BID",
+        "notes": "First-line; bleaches fabric"
+      },
+      {
+        "drug": "Adapalene 0.1%",
+        "dose": "Apply QHS",
+        "notes": "Least irritating retinoid"
+      },
+      {
+        "drug": "Tretinoin 0.025%",
+        "dose": "Apply QHS",
+        "notes": "Most cost-effective; photosensitizing"
+      },
+      {
+        "drug": "Clindamycin 1%",
+        "dose": "Apply BID",
+        "notes": "Never monotherapy; combine with BPO"
+      },
+      {
+        "drug": "Azelaic acid 15%",
+        "dose": "Apply BID",
+        "notes": "Good for hyperpigmentation"
+      },
+      {
+        "drug": "Salicylic acid 0.5–2%",
+        "dose": "Apply up to BID",
+        "notes": "OTC available"
+      },
+      {
+        "drug": "Dapsone 5%",
+        "dose": "Apply BID",
+        "notes": "Anti-inflammatory; not antibacterial"
+      }
+    ],
+    "nonRx": [
+      "Gentle cleansing 2×/day",
+      "Non-comedogenic moisturizer",
+      "Avoid picking/squeezing",
+      "Sunscreen daily",
+      "Avoid harsh scrubs/astringents"
+    ],
+    "followUp": "Reassess in 6–8 weeks; expect improvement by 2–3 months Refer if no improvement or worsening"
+  },
+  {
+    "id": "02",
+    "name": "Allergic Rhinitis",
+    "slug": "allergic-rhinitis",
+    "symptoms": [
+      "Sneezing, nasal/palatal itching",
+      "Clear rhinorrhea, congestion",
+      "Itchy, watery eyes",
+      "Itchy throat, ear fullness",
+      "Headache, fatigue"
+    ],
+    "redFlags": [
+      "Unilateral symptoms",
+      "Fever, facial pain",
+      "Purulent nasal or ocular discharge",
+      "Loss of smell/taste",
+      "Recurrent epistaxis",
+      "Signs of asthma (wheezing, SOB)",
+      "No improvement after 2 weeks of therapy"
+    ],
+    "rxOptions": [
+      {
+        "drug": "Fluticasone nasal",
+        "dose": "1–2 sprays/nostril daily",
+        "notes": "First-line for moderate–severe"
+      },
+      {
+        "drug": "Mometasone nasal",
+        "dose": "2 sprays/nostril daily",
+        "notes": "Minimal systemic absorption"
+      },
+      {
+        "drug": "Cetirizine 10 mg",
+        "dose": "Once daily",
+        "notes": "May cause drowsiness"
+      },
+      {
+        "drug": "Loratadine 10 mg",
+        "dose": "Once daily",
+        "notes": "Non-sedating"
+      },
+      {
+        "drug": "Fexofenadine 180 mg",
+        "dose": "Once daily",
+        "notes": "Non-sedating"
+      },
+      {
+        "drug": "Desloratadine 5 mg",
+        "dose": "Once daily",
+        "notes": "Non-sedating"
+      },
+      {
+        "drug": "Bilastine 20 mg",
+        "dose": "Once daily",
+        "notes": "Take on empty stomach"
+      }
+    ],
+    "nonRx": [
+      "Allergen avoidance (pollen, mould, dust mites, pets)",
+      "Saline nasal irrigation",
+      "Keep windows closed during high pollen",
+      "Shower after outdoor exposure",
+      "HEPA filters"
+    ],
+    "followUp": "Reassess in 2 weeks Refer if no improvement or symptoms worsen"
+  },
+  {
+    "id": "03",
+    "name": "Aphthous Ulcers (Canker Sores)",
+    "slug": "aphthous-ulcers",
+    "symptoms": [
+      "Small round/oval ulcers with yellow-grey center and red halo",
+      "Located on inner lips, cheeks, tongue",
+      "Painful, difficulty eating/speaking/swallowing"
+    ],
+    "redFlags": [
+      "Ulcers >1 cm or lasting >14 days",
+      "Frequent recurrences without healing periods",
+      "Systemic symptoms: fever, GI symptoms, genital lesions",
+      "Suspected Behçet's, HIV, IBD, nutritional deficiency",
+      "Multiple large ulcers impairing eating/drinking"
+    ],
+    "rxOptions": [
+      {
+        "drug": "Triamcinolone dental paste",
+        "dose": "Apply to ulcer BID–QID",
+        "notes": "Apply at earliest sign"
+      }
+    ],
+    "nonRx": [
+      "Avoid spicy/acidic/hard/crunchy foods",
+      "SLS-free toothpaste",
+      "Warm salt water rinses",
+      "Soft toothbrush"
+    ],
+    "followUp": "Should improve within 7–10 days Refer if no improvement in 14 days or frequent recurrences"
+  },
+  {
+    "id": "04",
+    "name": "Candidal Stomatitis (Oral Thrush)",
+    "slug": "candidal-stomatitis",
+    "symptoms": [
+      "White creamy plaques on tongue, inner cheeks, soft palate",
+      "Plaques wipe off leaving raw, erythematous base",
+      "Burning sensation, altered taste",
+      "May have dysphagia"
+    ],
+    "redFlags": [
+      "Odynophagia or dysphagia (esophageal involvement)",
+      "Immunocompromised (HIV, chemo, transplant)",
+      "Recurrent or refractory infections",
+      "Infant failing to feed",
+      "Signs of systemic spread"
+    ],
+    "rxOptions": [
+      {
+        "drug": "Nystatin oral suspension",
+        "dose": "100,000 units/mL, 1 mL swish & swallow QID",
+        "notes": "Continue 48h after resolution"
+      }
+    ],
+    "nonRx": [
+      "Rinse mouth/gargle after ICS use",
+      "Use spacer for MDIs",
+      "Remove and clean dentures nightly",
+      "Smoking cessation",
+      "Optimize glycemic control"
+    ],
+    "followUp": "Reassess in 7 days Refer if no improvement or systemic symptoms develop"
+  },
+  {
+    "id": "05",
+    "name": "Conjunctivitis",
+    "slug": "conjunctivitis",
+    "symptoms": [
+      "**Bacterial:** Red eye + mucopurulent discharge, eyelids stuck together",
+      "**Viral:** Red eye + watery discharge, often with URI symptoms",
+      "**Allergic:** Bilateral red eyes + intense itching + watery discharge"
+    ],
+    "redFlags": [
+      "Severe eye pain or photophobia",
+      "Blurred/decreased vision",
+      "Contact lens wearer",
+      "Neonate",
+      "Copious purulent discharge (gonococcal)",
+      "No improvement: bacterial >48h, viral/allergic >3 days",
+      "History of eye trauma or surgery"
+    ],
+    "rxOptions": [
+      {
+        "drug": "Polymyxin B/Gramicidin drops",
+        "dose": "1–2 drops QID × 5–7 days",
+        "notes": "First-line bacterial"
+      },
+      {
+        "drug": "Polymyxin B/Trimethoprim drops",
+        "dose": "1–2 drops QID × 5–7 days",
+        "notes": "First-line bacterial"
+      },
+      {
+        "drug": "Erythromycin ointment",
+        "dose": "Apply QID × 5–7 days",
+        "notes": "Good for children"
+      },
+      {
+        "drug": "Fusidic acid drops",
+        "dose": "1 drop BID × 7 days",
+        "notes": "Longer dosing interval"
+      },
+      {
+        "drug": "Ketotifen drops",
+        "dose": "1 drop BID",
+        "notes": "Allergic conjunctivitis"
+      },
+      {
+        "drug": "Olopatadine drops",
+        "dose": "1 drop BID",
+        "notes": "Allergic conjunctivitis"
+      }
+    ],
+    "nonRx": [
+      "Strict hand hygiene",
+      "Avoid touching/rubbing eyes",
+      "Cold or warm compresses",
+      "Discard contaminated makeup",
+      "Stop contact lenses until resolved"
+    ],
+    "followUp": "Bacterial: reassess in 48h Viral/allergic: reassess in 3 days Refer if no improvement or worsening"
+  },
+  {
+    "id": "06",
+    "name": "Dermatitis (Atopic, Contact, Diaper)",
+    "slug": "dermatitis",
+    "symptoms": [
+      "Erythema, pruritus, scaling, vesicles",
+      "Dry, cracked skin",
+      "Lichenification in chronic cases",
+      "Erythema on convex surfaces (buttocks, genitals, thighs)",
+      "Inguinal folds **spared** = irritant type",
+      "Inguinal folds **involved + satellite pustules** = candidal type"
+    ],
+    "redFlags": [
+      "Widespread or severe involvement",
+      "Signs of secondary infection (weeping, crusting, fever)",
+      "No improvement after 2 weeks of topical therapy",
+      "Severe involvement of face/eyes/genitals",
+      "Suspected systemic contact dermatitis",
+      "Oozing, pus, vesicles, bleeding",
+      "Systemic signs (fever)",
+      "Rash outside diaper area",
+      "No improvement in 7 days",
+      "Immunocompromised infant"
+    ],
+    "rxOptions": [
+      {
+        "drug": "Hydrocortisone 0.5–1%",
+        "dose": "Apply BID",
+        "notes": "Face, intertriginous areas, children"
+      },
+      {
+        "drug": "Desonide 0.05%",
+        "dose": "Apply BID",
+        "notes": "Low potency; face/children"
+      },
+      {
+        "drug": "Betamethasone valerate 0.1%",
+        "dose": "Apply BID",
+        "notes": "Body/extremities only; max 2 weeks"
+      },
+      {
+        "drug": "Triamcinolone 0.1%",
+        "dose": "Apply BID",
+        "notes": "Body/extremities only"
+      },
+      {
+        "drug": "Clobetasone 0.05%",
+        "dose": "Apply BID",
+        "notes": "Moderate potency"
+      },
+      {
+        "drug": "Clotrimazole 1% cream",
+        "dose": "Apply TID",
+        "notes": "Candidal diaper dermatitis"
+      },
+      {
+        "drug": "Miconazole 2% cream",
+        "dose": "Apply BID",
+        "notes": "Candidal diaper dermatitis"
+      },
+      {
+        "drug": "Nystatin cream/powder",
+        "dose": "Apply QID",
+        "notes": "Candidal diaper dermatitis"
+      },
+      {
+        "drug": "Hydrocortisone 0.5–1%",
+        "dose": "Apply BID, short-term",
+        "notes": "Severe inflammation; max 7 days"
+      }
+    ],
+    "nonRx": [
+      "Frequent diaper changes (q2–4h)",
+      "Air drying, gentle cleansing",
+      "Barrier cream: zinc oxide 10–40%",
+      "Avoid fragranced products",
+      "Regular moisturizing (atopic)",
+      "Identify and avoid triggers (contact)"
+    ],
+    "followUp": "Reassess in 7 days Refer if no improvement or signs of infection"
+  },
+  {
+    "id": "07",
+    "name": "Dysmenorrhea",
+    "slug": "dysmenorrhea",
+    "symptoms": [
+      "Cramping lower abdominal pain radiating to back/thighs",
+      "Starts just before or during menses",
+      "Nausea, fatigue, diarrhea, headache"
+    ],
+    "redFlags": [
+      "Onset >2 years post-menarche",
+      "Pain outside first 3 days of menses",
+      "Change in pain pattern or flow",
+      "No improvement after 3 cycles of NSAIDs",
+      "Suspected endometriosis, PID, fibroids",
+      "Severe pain with fever"
+    ],
+    "rxOptions": [
+      {
+        "drug": "Ibuprofen 400 mg",
+        "dose": "1 tab q6–8h PRN (max 1200 mg/day)",
+        "notes": "Start at onset or 1–2 days before menses"
+      },
+      {
+        "drug": "Naproxen sodium 220 mg",
+        "dose": "1–2 tabs initially, then 1 tab q8–12h PRN (max 660 mg/day)",
+        "notes": "Longer duration of action"
+      }
+    ],
+    "nonRx": [
+      "Heat application (heating pad/hot water bottle)",
+      "Regular exercise (yoga, stretching)",
+      "Adequate rest"
+    ],
+    "followUp": "Reassess after 3 menstrual cycles Refer if no improvement or symptoms worsen"
+  },
+  {
+    "id": "08",
+    "name": "GERD / Dyspepsia",
+    "slug": "gerd",
+    "symptoms": [
+      "Heartburn, acid regurgitation",
+      "Epigastric pain",
+      "May include: chronic cough, hoarseness, wheezing, chest pain"
+    ],
+    "redFlags": [
+      "Dysphagia or odynophagia",
+      "GI bleeding (hematemesis, melena)",
+      "Unintentional weight loss",
+      "Anemia",
+      "Persistent vomiting",
+      "Chest pain (rule out cardiac)",
+      "Age >50 with new or worsening symptoms",
+      "Symptoms >3×/week despite OTC therapy"
+    ],
+    "rxOptions": [
+      {
+        "drug": "Calcium carbonate",
+        "dose": "500–1000 mg PRN",
+        "notes": "Quick relief; antacid"
+      },
+      {
+        "drug": "Famotidine 20 mg",
+        "dose": "1–2 tabs daily or BID",
+        "notes": "Onset ~1hr; lasts 12h"
+      },
+      {
+        "drug": "Omeprazole 20 mg",
+        "dose": "Once daily before breakfast",
+        "notes": "Max effect in 3–4 days; 14-day course"
+      },
+      {
+        "drug": "Pantoprazole 20 mg",
+        "dose": "Once daily before breakfast",
+        "notes": "Fewer drug interactions"
+      },
+      {
+        "drug": "Esomeprazole 20 mg",
+        "dose": "Once daily",
+        "notes": "14-day course for self-treatment"
+      }
+    ],
+    "nonRx": [
+      "Weight loss",
+      "Elevate head of bed 10 cm",
+      "Avoid meals 3h before lying down",
+      "Avoid triggers: fatty foods, chocolate, caffeine, alcohol, mint",
+      "Stop smoking",
+      "Avoid tight clothing"
+    ],
+    "followUp": "Reassess in 2 weeks Refer if no improvement or alarm symptoms develop"
+  },
+  {
+    "id": "09",
+    "name": "Hemorrhoids",
+    "slug": "hemorrhoids",
+    "symptoms": [
+      "Painless bright red rectal bleeding",
+      "Itching, swelling, burning",
+      "Pain if thrombosed external or prolapsed",
+      "Protrusion during defecation"
+    ],
+    "redFlags": [
+      "Dark or mixed blood in stool",
+      "Weight loss or change in bowel habits",
+      "Severe pain (suggests fissure/abscess)",
+      "Grade III/IV prolapse (cannot be manually reduced)",
+      "Signs of anemia",
+      "Age >50 without recent colon cancer screening",
+      "No improvement after 7 days"
+    ],
+    "rxOptions": [
+      {
+        "drug": "Hydrocortisone cream/suppository",
+        "dose": "Apply BID",
+        "notes": "Max 7 days"
+      },
+      {
+        "drug": "Pramoxine cream",
+        "dose": "Apply up to QID",
+        "notes": "Topical anesthetic"
+      },
+      {
+        "drug": "Phenylephrine ointment",
+        "dose": "Apply QID",
+        "notes": "Vasoconstrictor"
+      },
+      {
+        "drug": "Zinc oxide paste",
+        "dose": "Apply PRN",
+        "notes": "Protectant/astringent"
+      },
+      {
+        "drug": "Witch hazel pads",
+        "dose": "Apply PRN",
+        "notes": "Soothing/astringent"
+      }
+    ],
+    "nonRx": [
+      "High-fiber diet (25–38 g/day)",
+      "Adequate fluids (2 L/day)",
+      "Sitz baths 3–4× daily",
+      "Avoid straining/prolonged toilet time (>5 min)",
+      "Gentle perianal hygiene"
+    ],
+    "followUp": "Reassess in 7 days Refer if no improvement or red flags develop"
+  },
+  {
+    "id": "10",
+    "name": "Herpes Labialis (Cold Sores)",
+    "slug": "herpes-labialis",
+    "symptoms": [
+      "Prodrome: tingling, itching, burning at site",
+      "Clustered vesicles on erythematous base at vermilion border",
+      "Rupture, crust, heal in 7–10 days"
+    ],
+    "redFlags": [
+      "Immunocompromised patient",
+      "Lesions near eyes (herpes keratitis risk)",
+      "Severe primary infection with dehydration",
+      "No improvement in 2 weeks",
+      "Signs of secondary bacterial infection",
+      "Frequent recurrences (>6/year)"
+    ],
+    "rxOptions": [
+      {
+        "drug": "Acyclovir cream 5%",
+        "dose": "Apply 5× daily × 4 days",
+        "notes": "Start at prodrome"
+      },
+      {
+        "drug": "Docosanol 10% cream",
+        "dose": "Apply 5× daily until healed",
+        "notes": "OTC; start at earliest sign"
+      },
+      {
+        "drug": "Acyclovir 400 mg",
+        "dose": "1 tab TID × 5 days",
+        "notes": "Oral; more effective"
+      },
+      {
+        "drug": "Valacyclovir 2 g",
+        "dose": "2 g BID × 1 day",
+        "notes": "Oral; single-day regimen"
+      },
+      {
+        "drug": "Famciclovir 1500 mg",
+        "dose": "Single dose",
+        "notes": "Oral; single-dose regimen"
+      }
+    ],
+    "nonRx": [
+      "SPF 30+ lip balm (sun is a trigger)",
+      "Avoid touching/spreading virus",
+      "Keep lesion clean with mild soap/water",
+      "Avoid sharing utensils, towels, cosmetics",
+      "Start treatment at first sign (prodrome)"
+    ],
+    "followUp": "Reassess in 7–10 days Refer if no improvement or lesions near eyes"
+  },
+  {
+    "id": "11",
+    "name": "Impetigo",
+    "slug": "impetigo",
+    "symptoms": [
+      "**Nonbullous:** Honey-colored crusts on erythematous base, usually face/extremities",
+      "**Bullous:** Fluid-filled vesicles/bullae on trunk",
+      "Mild itching, usually no fever"
+    ],
+    "redFlags": [
+      "Extensive or multiple lesions",
+      "Systemic symptoms (fever, malaise)",
+      "Deep ulceration (ecthyma)",
+      "Signs of cellulitis",
+      "Immunocompromised",
+      "No improvement after 5–7 days of topical therapy",
+      "Outbreaks in daycare/school settings"
+    ],
+    "rxOptions": [
+      {
+        "drug": "Mupirocin 2% ointment",
+        "dose": "Apply TID × 5–7 days",
+        "notes": "First-line"
+      },
+      {
+        "drug": "Fusidic acid 2% cream",
+        "dose": "Apply TID × 5–7 days",
+        "notes": "Alternative"
+      },
+      {
+        "drug": "Ozenoxacin 1% cream",
+        "dose": "Apply BID × 5 days",
+        "notes": "Alternative"
+      }
+    ],
+    "nonRx": [
+      "Warm compresses to remove crusts",
+      "Gentle washing with soap and water",
+      "Keep nails short",
+      "Avoid sharing towels/linens",
+      "Cover lesions loosely",
+      "Strict hand hygiene"
+    ],
+    "followUp": "Reassess in 5–7 days Refer if no improvement or systemic symptoms develop"
+  },
+  {
+    "id": "12",
+    "name": "Insect Bites & Urticaria (Hives)",
+    "slug": "insect-bites-urticaria",
+    "symptoms": [
+      "Localized erythema, swelling, itching, papules at bite/sting site",
+      "Hives: raised, itchy wheals",
+      "Large local reactions possible (>10 cm swelling)"
+    ],
+    "redFlags": [
+      "**Anaphylaxis:** difficulty breathing, throat swelling, hypotension, widespread hives, dizziness → **Call 911**",
+      "Signs of infection (pus, increasing redness/warmth, fever)",
+      "Tick bite with expanding rash >5 cm (erythema migrans)",
+      "Multiple stings",
+      "Bites near eyes/mouth"
+    ],
+    "rxOptions": [
+      {
+        "drug": "Cetirizine 10 mg",
+        "dose": "Once daily",
+        "notes": "Non-sedating; first-line"
+      },
+      {
+        "drug": "Loratadine 10 mg",
+        "dose": "Once daily",
+        "notes": "Non-sedating"
+      },
+      {
+        "drug": "Diphenhydramine 25–50 mg",
+        "dose": "q6–8h PRN",
+        "notes": "Sedating; night use"
+      },
+      {
+        "drug": "Hydrocortisone 1% cream",
+        "dose": "Apply BID",
+        "notes": "Local reactions"
+      },
+      {
+        "drug": "Calamine lotion",
+        "dose": "Apply PRN",
+        "notes": "Soothing"
+      }
+    ],
+    "nonRx": [
+      "Remove bee stinger by scraping (not squeezing)",
+      "Wash with soap and water",
+      "Cold compress/ice pack",
+      "Avoid scratching",
+      "Use insect repellent (DEET/icaridin)",
+      "Wear protective clothing"
+    ],
+    "followUp": "Reassess in 3–5 days Refer if signs of infection or no improvement"
+  },
+  {
+    "id": "13",
+    "name": "Musculoskeletal (Low Back Pain & Sports Injuries)",
+    "slug": "musculoskeletal",
+    "symptoms": [
+      "Localized pain, muscle spasm, stiffness, reduced ROM",
+      "Sprains (ligaments), strains (muscles), tendinitis, bursitis",
+      "May radiate to buttocks/legs (sciatica)"
+    ],
+    "redFlags": [
+      "**Cauda equina:** saddle anesthesia, bowel/bladder dysfunction → **EMERGENCY**",
+      "Inability to bear weight",
+      "Visible deformity or suspected fracture",
+      "Severe/unrelenting pain",
+      "Fever, unexplained weight loss",
+      "History of cancer",
+      "Significant trauma",
+      "No improvement after 2–4 weeks"
+    ],
+    "rxOptions": [
+      {
+        "drug": "Ibuprofen 400 mg",
+        "dose": "1 tab q6–8h PRN (max 1200 mg/day)",
+        "notes": "First-line"
+      },
+      {
+        "drug": "Naproxen sodium 220 mg",
+        "dose": "1–2 tabs initially, then 1 tab q8–12h PRN (max 660 mg/day)",
+        "notes": "Longer duration"
+      },
+      {
+        "drug": "Diclofenac gel 1%",
+        "dose": "Apply QID to affected area",
+        "notes": "Topical; fewer systemic effects"
+      },
+      {
+        "drug": "Acetaminophen 500 mg",
+        "dose": "1–2 tabs q6h PRN (max 3000–4000 mg/day)",
+        "notes": "Alternative if NSAIDs contraindicated"
+      }
+    ],
+    "nonRx": [
+      "Stay active (avoid bed rest)",
+      "RICE for acute injuries: Rest, Ice, Compression, Elevation (first 24–48h)",
+      "Heat for muscle pain",
+      "Proper lifting techniques",
+      "Gradual return to activity"
+    ],
+    "followUp": "Reassess in 1–2 weeks Refer if no improvement or red flags develop"
+  },
+  {
+    "id": "14",
+    "name": "Nausea & Vomiting",
+    "slug": "nausea-vomiting",
+    "symptoms": [
+      "Nausea, vomiting, retching",
+      "Abdominal discomfort",
+      "Signs of dehydration: dry mouth, decreased urine, dizziness"
+    ],
+    "redFlags": [
+      "Blood in vomit (red or coffee-ground)",
+      "Blood in stool",
+      "Severe abdominal pain",
+      "Altered mental status",
+      "Persistent vomiting >24–48h",
+      "Unable to keep liquids down >8h",
+      "Signs of significant dehydration",
+      "Age >55 with new-onset symptoms"
+    ],
+    "rxOptions": [
+      {
+        "drug": "Dimenhydrinate 50 mg",
+        "dose": "1–2 tabs q4–6h PRN (max 400 mg/day)",
+        "notes": "First-line; may cause drowsiness"
+      },
+      {
+        "drug": "Diphenhydramine 25–50 mg",
+        "dose": "q6–8h PRN",
+        "notes": "Sedating"
+      },
+      {
+        "drug": "Promethazine 12.5–25 mg",
+        "dose": "q4–6h PRN",
+        "notes": "Sedating; avoid in children <2"
+      }
+    ],
+    "nonRx": [
+      "Oral rehydration (small frequent sips)",
+      "Avoid fatty/large meals",
+      "Rest",
+      "Ginger"
+    ],
+    "followUp": "Reassess in 24–48h Refer if no improvement or red flags develop"
+  },
+  {
+    "id": "15",
+    "name": "Nausea & Vomiting of Pregnancy",
+    "slug": "nvp",
+    "symptoms": [
+      "Nausea ± vomiting",
+      "Typically starts 6–9 weeks gestation",
+      "Food aversions",
+      "May be worse in morning but can occur anytime"
+    ],
+    "redFlags": [
+      "Hyperemesis gravidarum: intractable vomiting, dehydration, weight loss >5%",
+      "Vomiting starting after 9 weeks",
+      "Abdominal pain or fever",
+      "Signs of other pathology (molar pregnancy, UTI, DKA)"
+    ],
+    "rxOptions": [
+      {
+        "drug": "Pyridoxine (B6) 25 mg",
+        "dose": "1 tab TID",
+        "notes": "First-line; safe in pregnancy"
+      },
+      {
+        "drug": "Doxylamine 10 mg + Pyridoxine 10 mg",
+        "dose": "1–2 tabs at bedtime",
+        "notes": "First-line combination"
+      },
+      {
+        "drug": "Dimenhydrinate 50 mg",
+        "dose": "q6–8h PRN",
+        "notes": "Second-line"
+      },
+      {
+        "drug": "Diphenhydramine 25–50 mg",
+        "dose": "q6–8h PRN",
+        "notes": "Second-line"
+      }
+    ],
+    "nonRx": [
+      "Small frequent bland meals",
+      "Crackers before getting out of bed",
+      "Separate solids and liquids",
+      "Avoid triggers/strong odors",
+      "P6 acupressure wristbands",
+      "Ginger"
+    ],
+    "followUp": "Reassess in 1 week Refer if no improvement or signs of hyperemesis gravidarum"
+  },
+  {
+    "id": "16",
+    "name": "Pinworms / Threadworms",
+    "slug": "pinworms",
+    "symptoms": [
+      "Intense perianal/perineal itching (worse at night)",
+      "Restlessness, insomnia",
+      "Often asymptomatic",
+      "Vulvovaginitis/irritation in females"
+    ],
+    "redFlags": [
+      "Abdominal pain, severe diarrhea, bloody stools",
+      "Fever",
+      "Signs of sexual abuse",
+      "Secondary bacterial infection from scratching"
+    ],
+    "rxOptions": [
+      {
+        "drug": "Mebendazole 100 mg",
+        "dose": "Single dose; repeat in 2 weeks",
+        "notes": "First-line; chewable"
+      },
+      {
+        "drug": "Pyrantel pamoate",
+        "dose": "11 mg/kg (max 1 g) single dose; repeat in 2 weeks",
+        "notes": "Alternative; OTC"
+      }
+    ],
+    "nonRx": [
+      "**Treat ALL household contacts simultaneously**",
+      "Morning showers",
+      "Wash hands and fingernails frequently",
+      "Keep nails short",
+      "Wash bedding/underwear/towels in hot water daily × 2 weeks",
+      "Avoid shaking linens",
+      "Vacuum bedrooms"
+    ],
+    "followUp": "Repeat dose in 2 weeks regardless Refer if symptoms persist after second treatment"
+  },
+  {
+    "id": "17",
+    "name": "Tick Bites — Lyme Disease Prophylaxis",
+    "slug": "tick-bites-lyme",
+    "symptoms": [
+      "Usually asymptomatic initially",
+      "Local hypersensitivity reaction: <5 cm, resolves in 1–2 days (normal)",
+      "Early Lyme: erythema migrans (expanding rash >5 cm, sometimes bull's-eye), flu-like symptoms"
+    ],
+    "redFlags": [
+      "Expanding rash >5 cm (erythema migrans)",
+      "Systemic symptoms: fever, chills, headache, facial palsy, joint swelling",
+      "Tick attached >72 hours ago",
+      "Symptomatic patient",
+      "Tick identified as *Ixodes scapularis* (black-legged tick)",
+      "Tick attached ≥36 hours (or engorged)",
+      "Prophylaxis started within 72 hours of tick removal",
+      "Patient can safely take doxycycline",
+      "Proper tick removal: fine-tipped tweezers, grasp close to skin, pull straight up",
+      "Clean area with soap and water",
+      "Monitor for symptoms × 30 days",
+      "Use repellents (DEET/icaridin)",
+      "Daily tick checks",
+      "Submit tick photo to eTick.ca for surveillance",
+      "Advise patient to monitor for symptoms × 30 days",
+      "Refer immediately if erythema migrans or systemic symptoms develop"
+    ],
+    "rxOptions": [
+      {
+        "drug": "Doxycycline",
+        "dose": "Adults: 200 mg single dose<br>Children: 4 mg/kg (max 200 mg) single dose",
+        "notes": "No age restriction for single dose"
+      }
+    ],
+    "nonRx": [
+      "Proper tick removal: fine-tipped tweezers, grasp close to skin, pull straight up",
+      "Clean area with soap and water",
+      "Monitor for symptoms × 30 days",
+      "Use repellents (DEET/icaridin)",
+      "Daily tick checks",
+      "Submit tick photo to eTick.ca for surveillance"
+    ],
+    "followUp": "Advise patient to monitor for symptoms × 30 days Refer immediately if erythema migrans or systemic symptoms develop"
+  },
+  {
+    "id": "18",
+    "name": "Urinary Tract Infection (Uncomplicated)",
+    "slug": "uti",
+    "symptoms": [
+      "Acute dysuria",
+      "Plus ≥1 of: new urinary urgency, frequency, suprapubic pain, hematuria, cloudy/foul-smelling urine"
+    ],
+    "redFlags": [
+      "Fever, rigors, flank/back pain, N/V (pyelonephritis)",
+      "Male patient",
+      "Pregnancy",
+      "Age <12",
+      "Immunocompromised",
+      "Abnormal urinary tract or indwelling catheter",
+      "Relapse (<4 weeks) or recurrent (≥2 in 6mo / ≥3 in 12mo)",
+      "Gross hematuria without dysuria"
+    ],
+    "rxOptions": [
+      {
+        "drug": "Nitrofurantoin 100 mg",
+        "dose": "1 cap BID × 5 days",
+        "notes": "First-line; avoid if CrCl <30"
+      },
+      {
+        "drug": "TMP-SMX (160/800 mg)",
+        "dose": "1 tab BID × 3 days",
+        "notes": "Alternative; check sulfa allergy"
+      },
+      {
+        "drug": "Trimethoprim 100 mg",
+        "dose": "1 tab BID × 3 days",
+        "notes": "Alternative"
+      },
+      {
+        "drug": "Fosfomycin 3 g",
+        "dose": "Single dose",
+        "notes": "Alternative; take on empty stomach"
+      }
+    ],
+    "nonRx": [
+      "Increase fluid intake",
+      "Void after intercourse",
+      "Proper wiping (front to back)",
+      "Avoid spermicides if recurrent",
+      "Cotton underwear"
+    ],
+    "followUp": "Advise patient to return if no improvement in 48–72h Refer if symptoms worsen or systemic symptoms develop"
+  },
+  {
+    "id": "19",
+    "name": "Vulvovaginal Candidiasis (Yeast Infection)",
+    "slug": "vvc",
+    "symptoms": [
+      "Intense vulvovaginal pruritus, burning",
+      "Erythema, edema",
+      "Thick white \"cottage cheese\" discharge",
+      "Dyspareunia, external dysuria",
+      "Vaginal pH <4.5"
+    ],
+    "redFlags": [
+      "First-time occurrence",
+      "Age <12 or postmenopausal",
+      "Pregnancy",
+      "Recurrent (>4/year) or persistent",
+      "Severe symptoms (fissures, extensive edema)",
+      "Immunocompromised or uncontrolled diabetes",
+      "Atypical discharge/odor (suggests BV or STI)",
+      "No improvement after 7 days"
+    ],
+    "rxOptions": [
+      {
+        "drug": "Fluconazole 150 mg",
+        "dose": "Single oral dose",
+        "notes": "First-line; NOT in pregnancy"
+      },
+      {
+        "drug": "Clotrimazole 1% cream",
+        "dose": "5 g intravaginally daily × 7–14 days",
+        "notes": "Safe in pregnancy"
+      },
+      {
+        "drug": "Clotrimazole 2% cream",
+        "dose": "5 g intravaginally daily × 3 days",
+        "notes": ""
+      },
+      {
+        "drug": "Miconazole 2% cream",
+        "dose": "5 g intravaginally daily × 7 days",
+        "notes": ""
+      },
+      {
+        "drug": "Miconazole 100 mg suppository",
+        "dose": "1 suppository daily × 7 days",
+        "notes": ""
+      },
+      {
+        "drug": "Terconazole 0.4% cream",
+        "dose": "5 g intravaginally daily × 7 days",
+        "notes": ""
+      }
+    ],
+    "nonRx": [
+      "Avoid douching, scented products, harsh soaps",
+      "Wear cotton underwear/loose clothing",
+      "Keep area dry",
+      "Avoid prolonged wet swimsuits"
+    ],
+    "followUp": "Reassess in 7 days Refer if no improvement or red flags develop"
+  }
+]
