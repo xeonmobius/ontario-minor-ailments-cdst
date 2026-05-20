@@ -54,8 +54,8 @@ describe("AilmentGrid", () => {
     expect(screen.getByRole("link", { name: /conjunctivitis/i })).toHaveAttribute("href", "/assess/conjunctivitis")
   })
 
-  it("shows first 3 symptoms as description", () => {
+  it("shows Rx option count", () => {
     render(<AilmentGrid />)
-    expect(screen.getByText("Comedones, Papules, Pustules")).toBeInTheDocument()
+    expect(screen.getAllByText("0 Rx options").length).toBe(3)
   })
 })

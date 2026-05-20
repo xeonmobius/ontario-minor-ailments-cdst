@@ -3,15 +3,29 @@ import { PharmacySettings } from "@/components/pharmacy-settings"
 
 export default function Home() {
   return (
-    <main className="min-h-screen p-6 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Ontario Minor Ailments</h1>
-          <p className="text-sm text-muted-foreground">Clinical Decision Support Tool — O. Reg. 256/24</p>
+    <div className="min-h-screen">
+      <header className="border-b bg-card">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm tracking-tight">
+              Rx
+            </div>
+            <div>
+              <h1 className="text-lg font-bold tracking-tight leading-none">Ontario Minor Ailments</h1>
+              <p className="text-xs text-muted-foreground mt-0.5">Clinical Decision Support Tool — O. Reg. 256/24</p>
+            </div>
+          </div>
+          <PharmacySettings />
         </div>
-        <PharmacySettings />
-      </div>
-      <AilmentGrid />
-    </main>
+      </header>
+      <main className="max-w-6xl mx-auto px-6 py-8">
+        <AilmentGrid />
+      </main>
+      <footer className="border-t mt-auto">
+        <div className="max-w-6xl mx-auto px-6 py-4 text-center text-xs text-muted-foreground">
+          Ontario Minor Ailment Prescribing per O. Reg. 256/24 — For pharmacist use only
+        </div>
+      </footer>
+    </div>
   )
 }

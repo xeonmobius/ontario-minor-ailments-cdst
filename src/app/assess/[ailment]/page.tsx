@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import { getAilmentBySlug } from "@/lib/ailments"
 import { WizardContainer } from "@/components/wizard/wizard-container"
+import { Button } from "@/components/ui/button"
 
 export default async function AssessPage({
   params,
@@ -16,14 +17,19 @@ export default async function AssessPage({
   }
 
   return (
-    <main className="min-h-screen p-6 max-w-3xl mx-auto">
-      <Link
-        href="/"
-        className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block"
-      >
-        &larr; Back to ailments
-      </Link>
-      <WizardContainer ailment={ailment} />
-    </main>
+    <div className="min-h-screen flex flex-col">
+      <header className="border-b bg-card">
+        <div className="max-w-3xl mx-auto px-6 py-3">
+          <Link href="/">
+            <Button variant="ghost" size="sm" className="text-muted-foreground -ml-2">
+              ← Back to ailments
+            </Button>
+          </Link>
+        </div>
+      </header>
+      <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-8">
+        <WizardContainer ailment={ailment} />
+      </main>
+    </div>
   )
 }
