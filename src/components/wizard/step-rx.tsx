@@ -1,26 +1,38 @@
 "use client"
 
 import { Ailment, SelectedRx } from "@/types"
+import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface StepRxProps {
   ailment: Ailment
   selectedRx: SelectedRx | null
   onSelect: (rx: Ailment["rxOptions"][number]) => void
   onSelectedRxChange: (rx: SelectedRx) => void
+  nonRxChecked: string[]
+  onNonRxChange: (items: string[]) => void
 }
 
-export function StepRx({ ailment, selectedRx, onSelect, onSelectedRxChange }: StepRxProps) {
+export function StepRx({ ailment, selectedRx, onSelect, onSelectedRxChange, nonRxChecked, onNonRxChange }: StepRxProps) {
   function handleFieldChange(field: keyof SelectedRx, value: string) {
     if (!selectedRx) return
     onSelectedRxChange({ ...selectedRx, [field]: value })
   }
 
+  function handleToggleNonRx(item: string) {
+    if (nonRxChecked.includes(item)) {
+      onNonRxChange(nonRxChecked.filter((i) => i !== item))
+    } else {
+      onNonRxChange([...nonRxChecked, item])
+    }
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <div>
         <h3 className="text-lg font-semibold mb-3">Select Prescription</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -29,9 +41,10 @@ export function StepRx({ ailment, selectedRx, onSelect, onSelectedRxChange }: St
             return (
               <Card
                 key={rx.drug}
-                className={`cursor-pointer transition-all ${
+                className={cn(
+                  "cursor-pointer transition-all duration-150",
                   isSelected ? "ring-2 ring-primary" : "hover:border-muted-foreground/50"
-                }`}
+                )}
                 onClick={() => onSelect(rx)}
               >
                 <CardHeader className="pb-2">
@@ -50,11 +63,11 @@ export function StepRx({ ailment, selectedRx, onSelect, onSelectedRxChange }: St
       </div>
 
       {selectedRx && (
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <Separator />
           <h3 className="text-lg font-semibold">Prescription Details</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="sig">Directions (Sig)</Label>
               <Input
                 id="sig"
@@ -63,7 +76,7 @@ export function StepRx({ ailment, selectedRx, onSelect, onSelectedRxChange }: St
                 onChange={(e) => handleFieldChange("sig", e.target.value)}
               />
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="quantity">Quantity</Label>
               <Input
                 id="quantity"
@@ -72,7 +85,7 @@ export function StepRx({ ailment, selectedRx, onSelect, onSelectedRxChange }: St
                 onChange={(e) => handleFieldChange("quantity", e.target.value)}
               />
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="refills">Refills</Label>
               <Input
                 id="refills"
@@ -81,7 +94,7 @@ export function StepRx({ ailment, selectedRx, onSelect, onSelectedRxChange }: St
                 onChange={(e) => handleFieldChange("refills", e.target.value)}
               />
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="duration">Duration</Label>
               <Input
                 id="duration"
@@ -95,14 +108,34 @@ export function StepRx({ ailment, selectedRx, onSelect, onSelectedRxChange }: St
       )}
 
       <div>
-        <h3 className="text-lg font-semibold mb-2">Non-Rx Advice</h3>
-        <ul className="list-disc list-inside space-y-1">
-          {ailment.nonRx.map((item) => (
-            <li key={item} className="text-sm text-muted-foreground">
-              {item}
-            </li>
-          ))}
-        </ul>
+        <h3 className="text-base font-semibold mb-2">Non-Rx Advice</h3>
+        <p className="text-xs text-muted-foreground mb-4">Check each item discussed with the patient.</p>
+        <div className="flex flex-col gap-2">
+          {ailment.nonRx.map((item) => {
+            const isChecked = nonRxChecked.includes(item)
+            return (
+              <div
+                key={item}
+                className={cn(
+                  "flex items-start gap-3 p-3 rounded-md border transition-colors duration-150",
+                  isChecked
+                    ? "border-primary/30 bg-primary/5"
+                    : "border-border hover:bg-accent/50"
+                )}
+              >
+                <Checkbox
+                  id={`nrx-${item}`}
+                  checked={isChecked}
+                  onCheckedChange={() => handleToggleNonRx(item)}
+                  className="mt-0.5"
+                />
+                <Label htmlFor={`nrx-${item}`} className="text-sm leading-snug cursor-pointer">
+                  {item}
+                </Label>
+              </div>
+            )
+          })}
+        </div>
       </div>
 
       <div>

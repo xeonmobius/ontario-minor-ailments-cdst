@@ -57,7 +57,7 @@ export function PharmacySettings() {
         <DialogHeader>
           <DialogTitle>Pharmacy Settings</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-3">
+        <div className="flex flex-col gap-3">
           {(
             [
               ["pharmacyName", "Pharmacy Name"],
@@ -71,7 +71,7 @@ export function PharmacySettings() {
               ["registrationNumber", "Registration Number"],
             ] as const
           ).map(([field, label]) => (
-            <div key={field} className="grid gap-1">
+            <div key={field} className="flex flex-col gap-1">
               <Label htmlFor={field}>{label}</Label>
               <Input
                 id={field}
@@ -80,7 +80,7 @@ export function PharmacySettings() {
               />
             </div>
           ))}
-          <div className="grid gap-1">
+          <div className="flex flex-col gap-1">
             <Label htmlFor="province">Province</Label>
             <Input id="province" value={data.province} disabled />
           </div>

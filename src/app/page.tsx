@@ -3,11 +3,11 @@ import { PharmacySettings } from "@/components/pharmacy-settings"
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       <header className="border-b bg-card">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm tracking-tight">
+            <div className="size-9 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm tracking-tight">
               Rx
             </div>
             <div>
@@ -18,7 +18,7 @@ export default function Home() {
           <PharmacySettings />
         </div>
       </header>
-      <main className="max-w-6xl mx-auto px-6 py-8">
+      <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-8">
         <AilmentGrid />
       </main>
       <footer className="border-t mt-auto">

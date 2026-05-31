@@ -18,6 +18,7 @@ export interface Ailment {
 export interface PatientInfo {
   name: string
   dob: string
+  sex: string
   ohip: string
   address: string
   city: string

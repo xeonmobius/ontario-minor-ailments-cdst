@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Ailment, PatientInfo, SelectedRx } from "@/types"
-import { WizardNav } from "./wizard-nav"
+import { WizardNav, StepIndicator } from "./wizard-nav"
 import { StepPatient } from "./step-patient"
 import { StepRedFlags } from "./step-redflags"
 import { StepRx } from "./step-rx"
@@ -11,6 +11,7 @@ import { StepGenerate } from "./step-generate"
 const defaultPatient: PatientInfo = {
   name: "",
   dob: "",
+  sex: "",
   ohip: "",
   address: "",
   city: "",
@@ -28,8 +29,10 @@ export function WizardContainer({ ailment }: WizardContainerProps) {
   const [step, setStep] = useState(0)
   const [patient, setPatient] = useState<PatientInfo>(defaultPatient)
   const [redFlagsChecked, setRedFlagsChecked] = useState<string[]>([])
+  const [symptomsChecked, setSymptomsChecked] = useState<string[]>([])
   const [assessmentNotes, setAssessmentNotes] = useState("")
   const [selectedRx, setSelectedRx] = useState<SelectedRx | null>(null)
+  const [nonRxChecked, setNonRxChecked] = useState<string[]>([])
 
   const canNext =
     step === 0
@@ -64,10 +67,10 @@ export function WizardContainer({ ailment }: WizardContainerProps) {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="space-y-1">
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center justify-center h-6 w-6 rounded bg-primary/10 text-primary text-xs font-bold">
+          <span className="inline-flex items-center justify-center size-6 rounded bg-primary/10 text-primary text-xs font-bold">
             {ailment.id.split("-")[0]}
           </span>
           <h2 className="text-xl font-bold tracking-tight">{ailment.name}</h2>
@@ -75,33 +78,46 @@ export function WizardContainer({ ailment }: WizardContainerProps) {
         <p className="text-xs text-muted-foreground pl-8">Ontario Minor Ailment Assessment — O. Reg. 256/24</p>
       </div>
 
+      <StepIndicator step={step} />
+
       <div className="bg-card border rounded-lg p-6">
-        {step === 0 && <StepPatient patient={patient} onChange={setPatient} />}
-        {step === 1 && (
-          <StepRedFlags
-            ailment={ailment}
-            redFlagsChecked={redFlagsChecked}
-            onRedFlagChange={setRedFlagsChecked}
-            assessmentNotes={assessmentNotes}
-            onNotesChange={setAssessmentNotes}
-          />
-        )}
-        {step === 2 && (
-          <StepRx
-            ailment={ailment}
-            selectedRx={selectedRx}
-            onSelect={handleSelectRx}
-            onSelectedRxChange={handleSelectedRxChange}
-          />
-        )}
-        {step === 3 && selectedRx && (
-          <StepGenerate
-            ailment={ailment}
-            patient={patient}
-            selectedRx={selectedRx}
-            assessmentNotes={assessmentNotes}
-          />
-        )}
+        <div
+          key={step}
+          className="motion-safe:animate-in"
+        >
+          {step === 0 && <StepPatient patient={patient} onChange={setPatient} />}
+          {step === 1 && (
+            <StepRedFlags
+              ailment={ailment}
+              redFlagsChecked={redFlagsChecked}
+              onRedFlagChange={setRedFlagsChecked}
+              symptomsChecked={symptomsChecked}
+              onSymptomChange={setSymptomsChecked}
+              assessmentNotes={assessmentNotes}
+              onNotesChange={setAssessmentNotes}
+            />
+          )}
+          {step === 2 && (
+            <StepRx
+              ailment={ailment}
+              selectedRx={selectedRx}
+              onSelect={handleSelectRx}
+              onSelectedRxChange={handleSelectedRxChange}
+              nonRxChecked={nonRxChecked}
+              onNonRxChange={setNonRxChecked}
+            />
+          )}
+          {step === 3 && selectedRx && (
+            <StepGenerate
+              ailment={ailment}
+              patient={patient}
+              selectedRx={selectedRx}
+              assessmentNotes={assessmentNotes}
+              symptomsChecked={symptomsChecked}
+              nonRxChecked={nonRxChecked}
+            />
+          )}
+        </div>
       </div>
 
       <WizardNav step={step} canNext={canNext} onBack={handleBack} onNext={handleNext} />

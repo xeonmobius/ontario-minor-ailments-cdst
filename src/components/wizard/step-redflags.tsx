@@ -1,9 +1,9 @@
 "use client"
 
 import { Ailment } from "@/types"
+import { cn } from "@/lib/utils"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
@@ -11,6 +11,8 @@ interface StepRedFlagsProps {
   ailment: Ailment
   redFlagsChecked: string[]
   onRedFlagChange: (flags: string[]) => void
+  symptomsChecked: string[]
+  onSymptomChange: (symptoms: string[]) => void
   assessmentNotes: string
   onNotesChange: (notes: string) => void
 }
@@ -19,6 +21,8 @@ export function StepRedFlags({
   ailment,
   redFlagsChecked,
   onRedFlagChange,
+  symptomsChecked,
+  onSymptomChange,
   assessmentNotes,
   onNotesChange,
 }: StepRedFlagsProps) {
@@ -32,26 +36,34 @@ export function StepRedFlags({
     }
   }
 
+  function handleToggleSymptom(symptom: string) {
+    if (symptomsChecked.includes(symptom)) {
+      onSymptomChange(symptomsChecked.filter((s) => s !== symptom))
+    } else {
+      onSymptomChange([...symptomsChecked, symptom])
+    }
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <div>
         <div className="flex items-center gap-2 mb-3">
           <span className="text-destructive text-lg">⚠</span>
           <h3 className="text-base font-semibold">Red Flags — Screen for Referral</h3>
         </div>
         <p className="text-xs text-muted-foreground mb-4">Check each red flag present. If ANY is checked, the patient must be referred.</p>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           {ailment.redFlags.map((flag) => {
             const isChecked = redFlagsChecked.includes(flag)
             return (
               <div
                 key={flag}
-                className={`flex items-start gap-3 p-3 rounded-md border transition-colors cursor-pointer ${
+                className={cn(
+                  "flex items-start gap-3 p-3 rounded-md border transition-colors duration-150",
                   isChecked
                     ? "border-destructive/50 bg-destructive/5"
                     : "border-border hover:bg-accent/50"
-                }`}
-                onClick={() => handleToggle(flag)}
+                )}
               >
                 <Checkbox
                   id={`rf-${flag}`}
@@ -81,16 +93,36 @@ export function StepRedFlags({
         <>
           <div>
             <h3 className="text-base font-semibold mb-3">Presenting Symptoms</h3>
-            <div className="flex flex-wrap gap-1.5">
-              {ailment.symptoms.map((symptom) => (
-                <Badge key={symptom} variant="secondary" className="text-xs">
-                  {symptom}
-                </Badge>
-              ))}
+            <p className="text-xs text-muted-foreground mb-4">Check each symptom the patient is presenting with.</p>
+            <div className="flex flex-col gap-2">
+              {ailment.symptoms.map((symptom) => {
+                const isChecked = symptomsChecked.includes(symptom)
+                return (
+                  <div
+                    key={symptom}
+                    className={cn(
+                      "flex items-start gap-3 p-3 rounded-md border transition-colors duration-150",
+                      isChecked
+                        ? "border-primary/30 bg-primary/5"
+                        : "border-border hover:bg-accent/50"
+                    )}
+                  >
+                    <Checkbox
+                      id={`sy-${symptom}`}
+                      checked={isChecked}
+                      onCheckedChange={() => handleToggleSymptom(symptom)}
+                      className="mt-0.5"
+                    />
+                    <Label htmlFor={`sy-${symptom}`} className="text-sm leading-snug cursor-pointer">
+                      {symptom}
+                    </Label>
+                  </div>
+                )
+              })}
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="assessment-notes" className="text-sm font-medium">Assessment Notes</Label>
             <Textarea
               id="assessment-notes"

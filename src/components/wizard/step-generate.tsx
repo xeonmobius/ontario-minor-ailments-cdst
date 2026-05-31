@@ -3,8 +3,7 @@
 import { Ailment, PatientInfo, SelectedRx } from "@/types"
 import { getPharmacyDefaults } from "@/lib/pharmacy-storage"
 import { downloadPdf } from "@/lib/pdf-helpers"
-import { PrescriptionPdf } from "@/components/prescription-pdf"
-import { NotificationPdf } from "@/components/notification-pdf"
+import { CombinedPdf } from "@/components/combined-pdf"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -14,42 +13,35 @@ interface StepGenerateProps {
   patient: PatientInfo
   selectedRx: SelectedRx
   assessmentNotes: string
+  symptomsChecked: string[]
+  nonRxChecked: string[]
 }
 
-export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes }: StepGenerateProps) {
+export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, symptomsChecked, nonRxChecked }: StepGenerateProps) {
   const dateOfAssessment = new Date().toLocaleDateString("en-CA")
 
-  async function handleDownloadPrescription() {
-    const doc = <PrescriptionPdf
-      ailment={ailment}
-      patient={patient}
-      selectedRx={selectedRx}
-      assessmentNotes={assessmentNotes}
-      dateOfAssessment={dateOfAssessment}
-    />
-    await downloadPdf(doc, `prescription-${patient.name.replace(/\s+/g, "-").toLowerCase()}.pdf`)
-  }
-
-  async function handleDownloadNotification() {
+  async function handleDownload() {
     const pharmacy = getPharmacyDefaults()
-    const doc = <NotificationPdf
+    const doc = <CombinedPdf
       ailment={ailment}
       patient={patient}
       selectedRx={selectedRx}
       assessmentNotes={assessmentNotes}
       dateOfAssessment={dateOfAssessment}
       pharmacy={pharmacy}
+      symptomsChecked={symptomsChecked}
+      nonRxChecked={nonRxChecked}
     />
-    await downloadPdf(doc, `notification-${patient.name.replace(/\s+/g, "-").toLowerCase()}.pdf`)
+    await downloadPdf(doc, `prescription-${patient.name.replace(/\s+/g, "-").toLowerCase()}.pdf`)
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
           <CardTitle>Assessment Summary</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="flex flex-col gap-3">
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div><span className="font-semibold">Patient:</span> {patient.name}</div>
             <div><span className="font-semibold">DOB:</span> {patient.dob}</div>
@@ -65,12 +57,12 @@ export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes }: 
       <Separator />
 
       <div className="flex flex-col gap-3">
-        <Button onClick={handleDownloadPrescription}>
-          Download Prescription PDF
+        <Button onClick={handleDownload}>
+          Download Prescription + Doctor Notification PDF
         </Button>
-        <Button variant="outline" onClick={handleDownloadNotification}>
-          Download Doctor Notification PDF
-        </Button>
+        <p className="text-xs text-muted-foreground">
+          Combined single-page document with full clinical documentation, prescription, physician notification, and signature lines. Print, sign, and fax to the physician.
+        </p>
       </div>
     </div>
   )

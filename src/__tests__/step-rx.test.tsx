@@ -27,6 +27,8 @@ describe("StepRx", () => {
         selectedRx={null}
         onSelect={vi.fn()}
         onSelectedRxChange={vi.fn()}
+        nonRxChecked={[]}
+        onNonRxChange={vi.fn()}
       />
     )
 
@@ -51,6 +53,8 @@ describe("StepRx", () => {
         selectedRx={selectedRx}
         onSelect={vi.fn()}
         onSelectedRxChange={vi.fn()}
+        nonRxChecked={[]}
+        onNonRxChange={vi.fn()}
       />
     )
 
@@ -60,18 +64,59 @@ describe("StepRx", () => {
     expect(screen.getByLabelText(/duration/i)).toBeInTheDocument()
   })
 
-  it("shows non-Rx advice", () => {
+  it("renders non-Rx advice as checkboxes", () => {
     render(
       <StepRx
         ailment={mockAilment}
         selectedRx={null}
         onSelect={vi.fn()}
         onSelectedRxChange={vi.fn()}
+        nonRxChecked={[]}
+        onNonRxChange={vi.fn()}
       />
     )
 
     expect(screen.getByText("Gentle cleanser")).toBeInTheDocument()
     expect(screen.getByText("Moisturizer")).toBeInTheDocument()
+    const checkboxes = screen.getAllByRole("checkbox")
+    expect(checkboxes.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it("calls onNonRxChange when a non-Rx checkbox is toggled", () => {
+    const onNonRxChange = vi.fn()
+    render(
+      <StepRx
+        ailment={mockAilment}
+        selectedRx={null}
+        onSelect={vi.fn()}
+        onSelectedRxChange={vi.fn()}
+        nonRxChecked={[]}
+        onNonRxChange={onNonRxChange}
+      />
+    )
+
+    fireEvent.click(screen.getByText("Gentle cleanser"))
+    expect(onNonRxChange).toHaveBeenCalledWith(["Gentle cleanser"])
+  })
+
+  it("shows checked non-Rx items as checked", () => {
+    render(
+      <StepRx
+        ailment={mockAilment}
+        selectedRx={null}
+        onSelect={vi.fn()}
+        onSelectedRxChange={vi.fn()}
+        nonRxChecked={["Gentle cleanser"]}
+        onNonRxChange={vi.fn()}
+      />
+    )
+
+    const gentleLabel = screen.getByText("Gentle cleanser")
+    const row = gentleLabel.closest("div")!
+    expect(row.className).toContain("border-primary")
+    const moisturizerLabel = screen.getByText("Moisturizer")
+    const moisturizerRow = moisturizerLabel.closest("div")!
+    expect(moisturizerRow.className).not.toContain("border-primary")
   })
 
   it("shows follow-up text", () => {
@@ -81,6 +126,8 @@ describe("StepRx", () => {
         selectedRx={null}
         onSelect={vi.fn()}
         onSelectedRxChange={vi.fn()}
+        nonRxChecked={[]}
+        onNonRxChange={vi.fn()}
       />
     )
 
@@ -95,6 +142,8 @@ describe("StepRx", () => {
         selectedRx={null}
         onSelect={onSelect}
         onSelectedRxChange={vi.fn()}
+        nonRxChecked={[]}
+        onNonRxChange={vi.fn()}
       />
     )
 
