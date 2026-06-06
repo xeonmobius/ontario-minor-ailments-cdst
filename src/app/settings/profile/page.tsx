@@ -22,7 +22,7 @@ export default async function ProfileSettingsPage() {
         </div>
       </header>
       <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-8">
-        <ProfileForm defaults={data} userId={profile.id} />
+        <ProfileForm defaults={data} userId={profile.id} currentEmail={profile.email ?? ""} />
       </main>
     </div>
   )

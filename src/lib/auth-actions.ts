@@ -265,3 +265,37 @@ export async function changePassword(_prev: any, formData: FormData) {
   await logAuditEvent("auth.password_change", { method: "settings" })
   return { success: true }
 }
+
+export async function changeEmail(_prev: any, formData: FormData) {
+  const email = formData.get("email") as string
+  const currentPassword = formData.get("currentPassword") as string
+
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getUser()
+
+  if (!userData.user?.email) {
+    return { error: "Not authenticated" }
+  }
+
+  if (email === userData.user.email) {
+    return { error: "New email is the same as current email" }
+  }
+
+  const { error: reAuthError } = await supabase.auth.signInWithPassword({
+    email: userData.user.email,
+    password: currentPassword,
+  })
+
+  if (reAuthError) {
+    return { error: "Current password is incorrect" }
+  }
+
+  const { error } = await supabase.auth.updateUser({ email })
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  await logAuditEvent("auth.email_change", { old_email: userData.user.email, new_email: email })
+  return { success: true }
+}

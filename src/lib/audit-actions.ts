@@ -8,6 +8,7 @@ type EventType =
   | "auth.login_failed"
   | "auth.signup"
   | "auth.password_change"
+  | "auth.email_change"
   | "pharmacy.updated"
   | "profile.updated"
   | "team.invite_created"
