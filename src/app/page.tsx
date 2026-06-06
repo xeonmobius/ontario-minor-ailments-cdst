@@ -1,7 +1,10 @@
 import { AilmentGrid } from "@/components/ailment-grid"
-import { PharmacySettings } from "@/components/pharmacy-settings"
+import { UserNav } from "@/components/user-nav"
+import { requireAuth } from "@/lib/auth-guards"
 
-export default function Home() {
+export default async function Home() {
+  const profile = await requireAuth()
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b bg-card">
@@ -15,7 +18,7 @@ export default function Home() {
               <p className="text-xs text-muted-foreground mt-0.5">Clinical Decision Support Tool — O. Reg. 256/24</p>
             </div>
           </div>
-          <PharmacySettings />
+          <UserNav profile={profile} />
         </div>
       </header>
       <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-8">

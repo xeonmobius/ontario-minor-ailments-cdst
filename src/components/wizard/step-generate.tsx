@@ -1,7 +1,6 @@
 "use client"
 
-import { Ailment, PatientInfo, SelectedRx } from "@/types"
-import { getPharmacyDefaults } from "@/lib/pharmacy-storage"
+import { Ailment, PatientInfo, PharmacyDefaults, SelectedRx } from "@/types"
 import { downloadPdf } from "@/lib/pdf-helpers"
 import { CombinedPdf } from "@/components/combined-pdf"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -15,20 +14,20 @@ interface StepGenerateProps {
   assessmentNotes: string
   symptomsChecked: string[]
   nonRxChecked: string[]
+  pharmacy?: PharmacyDefaults | null
 }
 
-export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, symptomsChecked, nonRxChecked }: StepGenerateProps) {
+export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, symptomsChecked, nonRxChecked, pharmacy }: StepGenerateProps) {
   const dateOfAssessment = new Date().toLocaleDateString("en-CA")
 
   async function handleDownload() {
-    const pharmacy = getPharmacyDefaults()
     const doc = <CombinedPdf
       ailment={ailment}
       patient={patient}
       selectedRx={selectedRx}
       assessmentNotes={assessmentNotes}
       dateOfAssessment={dateOfAssessment}
-      pharmacy={pharmacy}
+      pharmacy={pharmacy ?? null}
       symptomsChecked={symptomsChecked}
       nonRxChecked={nonRxChecked}
     />
