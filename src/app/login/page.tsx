@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { login } from "@/lib/auth-actions"
 import { Button } from "@/components/ui/button"
@@ -9,10 +10,19 @@ import { Label } from "@/components/ui/label"
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   async function handleSubmit(formData: FormData) {
+    setLoading(true)
+    setError(null)
     const result = await login(formData)
-    if (result?.error) setError(result.error)
+    if (result?.error) {
+      setError(result.error)
+      setLoading(false)
+    } else {
+      router.push("/")
+    }
   }
 
   return (
@@ -40,8 +50,8 @@ export default function LoginPage() {
             <Label htmlFor="password">Password</Label>
             <Input id="password" name="password" type="password" required />
           </div>
-          <Button type="submit" className="w-full">
-            Sign in
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Signing in..." : "Sign in"}
           </Button>
         </form>
 

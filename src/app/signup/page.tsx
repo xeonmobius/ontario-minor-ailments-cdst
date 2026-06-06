@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { signup } from "@/lib/auth-actions"
 import { Button } from "@/components/ui/button"
@@ -9,11 +10,19 @@ import { Label } from "@/components/ui/label"
 
 export default function SignupPage() {
   const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   async function handleSubmit(formData: FormData) {
+    setLoading(true)
     setError(null)
     const result = await signup(formData)
-    if (result?.error) setError(result.error)
+    if (result?.error) {
+      setError(result.error)
+      setLoading(false)
+    } else {
+      router.push("/")
+    }
   }
 
   return (
@@ -78,8 +87,8 @@ export default function SignupPage() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full">
-            Create account
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Creating account..." : "Create account"}
           </Button>
         </form>
 
