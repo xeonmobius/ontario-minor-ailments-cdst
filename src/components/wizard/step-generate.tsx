@@ -1,8 +1,10 @@
 "use client"
 
+import { useState } from "react"
 import { Ailment, PatientInfo, PharmacyDefaults, SelectedRx } from "@/types"
 import { downloadPdf } from "@/lib/pdf-helpers"
 import { CombinedPdf } from "@/components/combined-pdf"
+import { reserveTxId } from "@/lib/prescription-actions"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -19,8 +21,14 @@ interface StepGenerateProps {
 
 export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, symptomsChecked, nonRxChecked, pharmacy }: StepGenerateProps) {
   const dateOfAssessment = new Date().toLocaleDateString("en-CA")
+  const [txId, setTxId] = useState<string | null>(null)
 
   async function handleDownload() {
+    if (!txId) {
+      const result = await reserveTxId()
+      if (result.error) return
+      setTxId(result.txId ?? null)
+    }
     const doc = <CombinedPdf
       ailment={ailment}
       patient={patient}
@@ -30,8 +38,9 @@ export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, sy
       pharmacy={pharmacy ?? null}
       symptomsChecked={symptomsChecked}
       nonRxChecked={nonRxChecked}
+      txId={txId ?? undefined}
     />
-    await downloadPdf(doc, `prescription-${patient.name.replace(/\s+/g, "-").toLowerCase()}.pdf`)
+    await downloadPdf(doc, `prescription-${dateOfAssessment}-${txId ?? "draft"}.pdf`)
   }
 
   return (

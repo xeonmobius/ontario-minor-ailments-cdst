@@ -153,6 +153,7 @@ interface CombinedPdfProps {
   pharmacy: PharmacyDefaults | null
   symptomsChecked: string[]
   nonRxChecked: string[]
+  txId?: string
 }
 
 export function CombinedPdf({
@@ -164,6 +165,7 @@ export function CombinedPdf({
   pharmacy,
   symptomsChecked,
   nonRxChecked,
+  txId,
 }: CombinedPdfProps) {
   const activeSymptoms = filterCheckedItems(ailment.symptoms, symptomsChecked)
   const activeNonRx = filterCheckedItems(ailment.nonRx, nonRxChecked)
@@ -179,6 +181,7 @@ export function CombinedPdf({
           <View style={{ alignItems: "flex-end" }}>
             <Text style={styles.confidentialBadge}>CONFIDENTIAL</Text>
             <Text style={styles.dateText}>{dateOfAssessment}</Text>
+            {txId && <Text style={styles.dateText}>Tx: {txId}</Text>}
           </View>
         </View>
 
