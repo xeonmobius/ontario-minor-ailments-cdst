@@ -58,22 +58,24 @@ export function StepRedFlags({
             return (
               <div
                 key={flag}
+                onClick={() => handleToggle(flag)}
                 className={cn(
-                  "flex items-start gap-3 p-3 rounded-md border transition-colors duration-150",
+                  "flex items-start gap-3 p-3 rounded-md border cursor-pointer transition-colors duration-150",
                   isChecked
                     ? "border-destructive/50 bg-destructive/5"
-                    : "border-border hover:bg-accent/50"
+                    : "border-border hover:bg-destructive/5"
                 )}
               >
                 <Checkbox
-                  id={`rf-${flag}`}
                   checked={isChecked}
                   onCheckedChange={() => handleToggle(flag)}
-                  className="mt-0.5"
+                  className={cn(
+                    "mt-0.5 pointer-events-none data-checked:border-destructive data-checked:bg-destructive data-checked:text-white",
+                  )}
                 />
-                <Label htmlFor={`rf-${flag}`} className="text-sm leading-snug cursor-pointer">
+                <span className="text-sm leading-snug">
                   {flag}
-                </Label>
+                </span>
               </div>
             )
           })}
@@ -98,24 +100,24 @@ export function StepRedFlags({
               {ailment.symptoms.map((symptom) => {
                 const isChecked = symptomsChecked.includes(symptom)
                 return (
-                  <div
-                    key={symptom}
-                    className={cn(
-                      "flex items-start gap-3 p-3 rounded-md border transition-colors duration-150",
-                      isChecked
-                        ? "border-primary/30 bg-primary/5"
-                        : "border-border hover:bg-accent/50"
-                    )}
-                  >
+              <div
+                key={symptom}
+                onClick={() => handleToggleSymptom(symptom)}
+                className={cn(
+                  "flex items-start gap-3 p-3 rounded-md border cursor-pointer transition-colors duration-150",
+                  isChecked
+                    ? "border-primary/30 bg-primary/5"
+                    : "border-border hover:bg-accent/50"
+                )}
+              >
                     <Checkbox
-                      id={`sy-${symptom}`}
                       checked={isChecked}
                       onCheckedChange={() => handleToggleSymptom(symptom)}
-                      className="mt-0.5"
+                      className="mt-0.5 pointer-events-none"
                     />
-                    <Label htmlFor={`sy-${symptom}`} className="text-sm leading-snug cursor-pointer">
+                    <span className="text-sm leading-snug">
                       {symptom}
-                    </Label>
+                    </span>
                   </div>
                 )
               })}

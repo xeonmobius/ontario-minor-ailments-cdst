@@ -3,19 +3,44 @@ import { getAilmentBySlug } from "@/lib/ailments"
 import { WizardContainer } from "@/components/wizard/wizard-container"
 import { BackButton } from "@/components/back-button"
 import { requireAuth } from "@/lib/auth-guards"
+import { createClient } from "@/lib/supabase/server"
+import type { PharmacyDefaults } from "@/types"
 
 export default async function AssessPage({
   params,
 }: {
   params: Promise<{ ailment: string }>
 }) {
-  await requireAuth()
+  const profile = await requireAuth()
   const { ailment: slug } = await params
   const ailment = getAilmentBySlug(slug)
 
   if (!ailment) {
     notFound()
   }
+
+  const supabase = await createClient()
+
+  const { data: pharmacy } = await supabase
+    .from("pharmacies")
+    .select("name, address, city, province, postal_code, phone, fax")
+    .eq("id", profile.pharmacyId)
+    .single()
+
+  const pharmacyDefaults: PharmacyDefaults | null = pharmacy
+    ? {
+        pharmacyName: pharmacy.name,
+        address: pharmacy.address,
+        city: pharmacy.city,
+        province: pharmacy.province,
+        postalCode: pharmacy.postal_code,
+        phone: pharmacy.phone,
+        fax: pharmacy.fax ?? "",
+        pharmacistName: profile.fullName ?? "",
+        provincialLicense: profile.provincialLicense ?? "",
+        registrationNumber: profile.registrationNumber ?? "",
+      }
+    : null
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -25,7 +50,7 @@ export default async function AssessPage({
         </div>
       </header>
       <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-8">
-        <WizardContainer ailment={ailment} />
+        <WizardContainer ailment={ailment} pharmacy={pharmacyDefaults} />
       </main>
     </div>
   )

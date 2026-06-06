@@ -25,6 +25,7 @@ describe("Wizard navigation logic", () => {
     phone: "",
     allergies: "NKDA",
     currentMeds: "",
+    doctorName: "", doctorLicense: "", doctorPhone: "", doctorFax: "", doctorAddress: "",
   }
 
   it("starts at step 0", () => {

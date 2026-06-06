@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Separator } from "@/components/ui/separator"
 
 interface StepPatientProps {
   patient: PatientInfo
@@ -112,6 +113,52 @@ export function StepPatient({ patient, onChange }: StepPatientProps) {
             value={patient.currentMeds}
             onChange={(e) => handleChange("currentMeds", e.target.value)}
             aria-label="Current medications"
+          />
+        </div>
+      </div>
+
+      <Separator />
+
+      <p className="text-sm font-medium text-muted-foreground">Family Physician (optional)</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="doctorName">Doctor Name</Label>
+          <Input
+            id="doctorName"
+            value={patient.doctorName}
+            onChange={(e) => handleChange("doctorName", e.target.value)}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="doctorLicense">License #</Label>
+          <Input
+            id="doctorLicense"
+            value={patient.doctorLicense}
+            onChange={(e) => handleChange("doctorLicense", e.target.value)}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="doctorPhone">Phone</Label>
+          <Input
+            id="doctorPhone"
+            value={patient.doctorPhone}
+            onChange={(e) => handleChange("doctorPhone", e.target.value)}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="doctorFax">Fax</Label>
+          <Input
+            id="doctorFax"
+            value={patient.doctorFax}
+            onChange={(e) => handleChange("doctorFax", e.target.value)}
+          />
+        </div>
+        <div className="flex flex-col gap-2 md:col-span-2">
+          <Label htmlFor="doctorAddress">Address</Label>
+          <Input
+            id="doctorAddress"
+            value={patient.doctorAddress}
+            onChange={(e) => handleChange("doctorAddress", e.target.value)}
           />
         </div>
       </div>

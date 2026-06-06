@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Ailment, PatientInfo, SelectedRx } from "@/types"
+import { Ailment, PatientInfo, PharmacyDefaults, SelectedRx } from "@/types"
 import { WizardNav, StepIndicator } from "./wizard-nav"
 import { StepPatient } from "./step-patient"
 import { StepRedFlags } from "./step-redflags"
@@ -19,13 +19,19 @@ const defaultPatient: PatientInfo = {
   phone: "",
   allergies: "NKDA",
   currentMeds: "",
+  doctorName: "",
+  doctorLicense: "",
+  doctorPhone: "",
+  doctorFax: "",
+  doctorAddress: "",
 }
 
 interface WizardContainerProps {
   ailment: Ailment
+  pharmacy: PharmacyDefaults | null
 }
 
-export function WizardContainer({ ailment }: WizardContainerProps) {
+export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
   const [step, setStep] = useState(0)
   const [patient, setPatient] = useState<PatientInfo>(defaultPatient)
   const [redFlagsChecked, setRedFlagsChecked] = useState<string[]>([])
@@ -115,6 +121,7 @@ export function WizardContainer({ ailment }: WizardContainerProps) {
               assessmentNotes={assessmentNotes}
               symptomsChecked={symptomsChecked}
               nonRxChecked={nonRxChecked}
+              pharmacy={pharmacy}
             />
           )}
         </div>

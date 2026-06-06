@@ -116,22 +116,22 @@ export function StepRx({ ailment, selectedRx, onSelect, onSelectedRxChange, nonR
             return (
               <div
                 key={item}
+                onClick={() => handleToggleNonRx(item)}
                 className={cn(
-                  "flex items-start gap-3 p-3 rounded-md border transition-colors duration-150",
+                  "flex items-start gap-3 p-3 rounded-md border cursor-pointer transition-colors duration-150",
                   isChecked
                     ? "border-primary/30 bg-primary/5"
                     : "border-border hover:bg-accent/50"
                 )}
               >
                 <Checkbox
-                  id={`nrx-${item}`}
                   checked={isChecked}
                   onCheckedChange={() => handleToggleNonRx(item)}
-                  className="mt-0.5"
+                  className="mt-0.5 pointer-events-none"
                 />
-                <Label htmlFor={`nrx-${item}`} className="text-sm leading-snug cursor-pointer">
+                <span className="text-sm leading-snug">
                   {item}
-                </Label>
+                </span>
               </div>
             )
           })}

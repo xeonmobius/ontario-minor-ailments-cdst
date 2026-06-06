@@ -218,19 +218,33 @@ export function CombinedPdf({
             <View style={styles.fieldRow}><Text style={styles.label}>Red flags</Text><Text style={styles.value}>None identified</Text></View>
             {selectedRx.duration && <View style={styles.fieldRow}><Text style={styles.label}>Duration</Text><Text style={styles.value}>{selectedRx.duration}</Text></View>}
             <View style={styles.fieldRow}><Text style={styles.label}>Follow-up</Text><Text style={styles.value}>{ailment.followUp}</Text></View>
-
-            {activeSymptoms.length > 0 && (
-              <View style={{ marginTop: 3 }}>
-                <Text style={{ fontFamily: "Helvetica-Bold", fontSize: 6.5, color: TEAL, textTransform: "uppercase", letterSpacing: 1, marginBottom: 1 }}>Symptoms Confirmed</Text>
-                {activeSymptoms.map((s) => (
-                  <View key={s} style={styles.checkItem}>
-                    <Text style={[styles.bullet, { color: GREEN }]}>✓</Text>
-                    <Text style={styles.bulletText}>{s}</Text>
-                  </View>
-                ))}
-              </View>
-            )}
           </View>
+        </View>
+
+        <View style={styles.columns}>
+          {patient.doctorName ? (
+            <View style={styles.col}>
+              <Text style={styles.sectionLabel}>Family Physician (Faxed to)</Text>
+              <View style={styles.fieldRow}><Text style={styles.label}>Dr.</Text><Text style={styles.value}>{patient.doctorName}</Text></View>
+              {patient.doctorLicense && <View style={styles.fieldRow}><Text style={styles.label}>License</Text><Text style={styles.value}>{patient.doctorLicense}</Text></View>}
+              {patient.doctorPhone && <View style={styles.fieldRow}><Text style={styles.label}>Phone</Text><Text style={styles.value}>{patient.doctorPhone}</Text></View>}
+              {patient.doctorFax && <View style={styles.fieldRow}><Text style={styles.label}>Fax</Text><Text style={styles.value}>{patient.doctorFax}</Text></View>}
+              {patient.doctorAddress && <View style={styles.fieldRow}><Text style={styles.label}>Address</Text><Text style={styles.value}>{patient.doctorAddress}</Text></View>}
+            </View>
+          ) : (
+            <View style={styles.col} />
+          )}
+          {activeSymptoms.length > 0 && (
+            <View style={styles.col}>
+              <Text style={styles.sectionLabel}>Symptoms Confirmed</Text>
+              {activeSymptoms.map((s) => (
+                <View key={s} style={styles.checkItem}>
+                  <Text style={[styles.bullet, { color: GREEN }]}>✓</Text>
+                  <Text style={styles.bulletText}>{s}</Text>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
 
         {/* Rx */}
@@ -280,11 +294,6 @@ export function CombinedPdf({
             <Text style={{ fontSize: 6.5, fontFamily: "Helvetica-Bold", color: TEAL, marginBottom: 2, textTransform: "uppercase", letterSpacing: 1 }}>Pharmacist Signature</Text>
             <View style={styles.signatureLine} />
             <Text style={styles.signatureLabel}>{pharmacy?.pharmacistName || "__________"} — License #{pharmacy?.provincialLicense || "__________"}</Text>
-          </View>
-          <View style={[styles.signatureBox, { marginRight: 0 }]}>
-            <Text style={{ fontSize: 6.5, fontFamily: "Helvetica-Bold", color: TEAL, marginBottom: 2, textTransform: "uppercase", letterSpacing: 1 }}>Physician Acknowledgement</Text>
-            <View style={styles.signatureLine} />
-            <Text style={styles.signatureLabel}>Physician Name & CPSO # — Date</Text>
           </View>
         </View>
 

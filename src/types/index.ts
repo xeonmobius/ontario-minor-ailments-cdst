@@ -26,6 +26,11 @@ export interface PatientInfo {
   phone: string
   allergies: string
   currentMeds: string
+  doctorName: string
+  doctorLicense: string
+  doctorPhone: string
+  doctorFax: string
+  doctorAddress: string
 }
 
 export interface PharmacyDefaults {

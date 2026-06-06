@@ -14,6 +14,7 @@ const basePatient: PatientInfo = {
   phone: "",
   allergies: "NKDA",
   currentMeds: "",
+  doctorName: "", doctorLicense: "", doctorPhone: "", doctorFax: "", doctorAddress: "",
 }
 
 describe("StepPatient", () => {
@@ -23,11 +24,11 @@ describe("StepPatient", () => {
     const onChange = vi.fn()
     render(<StepPatient patient={basePatient} onChange={onChange} />)
 
-    expect(screen.getByLabelText(/name/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/patient name/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/date of birth/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/ohip/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/phone/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/address/i)).toBeInTheDocument()
+    expect(screen.getAllByLabelText(/^phone$/i).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByLabelText(/^address$/i).length).toBeGreaterThanOrEqual(1)
     expect(screen.getByLabelText(/city/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/postal code/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/allergies/i)).toBeInTheDocument()
@@ -43,7 +44,7 @@ describe("StepPatient", () => {
   it("calls onChange when name is typed", () => {
     const onChange = vi.fn()
     render(<StepPatient patient={basePatient} onChange={onChange} />)
-    fireEvent.change(screen.getByLabelText(/name/i), { target: { value: "Jane Doe" } })
+    fireEvent.change(screen.getByLabelText(/patient name/i), { target: { value: "Jane Doe" } })
     expect(onChange).toHaveBeenCalledWith({ ...basePatient, name: "Jane Doe" })
   })
 

@@ -24,23 +24,30 @@ export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, sy
   const [txId, setTxId] = useState<string | null>(null)
 
   async function handleDownload() {
-    if (!txId) {
-      const result = await reserveTxId()
-      if (result.error) return
-      setTxId(result.txId ?? null)
+    try {
+      let resolvedTxId = txId
+      if (!resolvedTxId) {
+        const result = await reserveTxId()
+        if (result.error) return
+        resolvedTxId = result.txId ?? null
+        setTxId(resolvedTxId)
+      }
+      const doc = <CombinedPdf
+        ailment={ailment}
+        patient={patient}
+        selectedRx={selectedRx}
+        assessmentNotes={assessmentNotes}
+        dateOfAssessment={dateOfAssessment}
+        pharmacy={pharmacy ?? null}
+        symptomsChecked={symptomsChecked}
+        nonRxChecked={nonRxChecked}
+        txId={resolvedTxId ?? undefined}
+      />
+      console.log("PDF patient data:", JSON.stringify({ doctorName: patient.doctorName, doctorLicense: patient.doctorLicense, doctorPhone: patient.doctorPhone, doctorFax: patient.doctorFax, doctorAddress: patient.doctorAddress }))
+      await downloadPdf(doc, `prescription-${dateOfAssessment}-${resolvedTxId ?? "draft"}.pdf`)
+    } catch (err) {
+      console.error("PDF download failed:", err)
     }
-    const doc = <CombinedPdf
-      ailment={ailment}
-      patient={patient}
-      selectedRx={selectedRx}
-      assessmentNotes={assessmentNotes}
-      dateOfAssessment={dateOfAssessment}
-      pharmacy={pharmacy ?? null}
-      symptomsChecked={symptomsChecked}
-      nonRxChecked={nonRxChecked}
-      txId={txId ?? undefined}
-    />
-    await downloadPdf(doc, `prescription-${dateOfAssessment}-${txId ?? "draft"}.pdf`)
   }
 
   return (
