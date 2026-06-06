@@ -17,6 +17,7 @@ describe("Wizard navigation logic", () => {
   const emptyPatient: PatientInfo = {
     name: "",
     dob: "",
+    sex: "",
     ohip: "",
     address: "",
     city: "",

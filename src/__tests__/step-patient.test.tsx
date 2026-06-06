@@ -6,6 +6,7 @@ import { PatientInfo } from "@/types"
 const basePatient: PatientInfo = {
   name: "",
   dob: "",
+  sex: "",
   ohip: "",
   address: "",
   city: "",

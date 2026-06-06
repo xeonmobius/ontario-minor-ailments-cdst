@@ -191,7 +191,7 @@ export function CombinedPdf({
               {pharmacy.address}{pharmacy.city ? `, ${pharmacy.city}` : ""}, {pharmacy.province} {pharmacy.postalCode} | Ph: {pharmacy.phone || "—"} | Fax: {pharmacy.fax || "—"}
             </Text>
             <Text style={styles.pharmacyDetail}>
-              {pharmacy.pharmacistName || "—"} | OCP: {pharmacy.ocpLicense || "—"} | Reg#: {pharmacy.registrationNumber || "—"}
+              {pharmacy.pharmacistName || "—"} | License: {pharmacy.provincialLicense || "—"} | Reg#: {pharmacy.registrationNumber || "—"}
             </Text>
           </View>
         )}
@@ -276,7 +276,7 @@ export function CombinedPdf({
           <View style={styles.signatureBox}>
             <Text style={{ fontSize: 6.5, fontFamily: "Helvetica-Bold", color: TEAL, marginBottom: 2, textTransform: "uppercase", letterSpacing: 1 }}>Pharmacist Signature</Text>
             <View style={styles.signatureLine} />
-            <Text style={styles.signatureLabel}>{pharmacy?.pharmacistName || "__________"} — OCP #{pharmacy?.ocpLicense || "__________"}</Text>
+            <Text style={styles.signatureLabel}>{pharmacy?.pharmacistName || "__________"} — License #{pharmacy?.provincialLicense || "__________"}</Text>
           </View>
           <View style={[styles.signatureBox, { marginRight: 0 }]}>
             <Text style={{ fontSize: 6.5, fontFamily: "Helvetica-Bold", color: TEAL, marginBottom: 2, textTransform: "uppercase", letterSpacing: 1 }}>Physician Acknowledgement</Text>
