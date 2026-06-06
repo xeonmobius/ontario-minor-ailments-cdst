@@ -35,6 +35,11 @@ export default function LoginPage() {
             <Label htmlFor="password">Password</Label>
             <Input id="password" name="password" type="password" required />
           </div>
+          <div className="text-right">
+            <Link href="/forgot-password" className="text-sm text-primary underline underline-offset-4">
+              Forgot password?
+            </Link>
+          </div>
           <Button type="submit" className="w-full" disabled={pending}>
             {pending ? "Signing in..." : "Sign in"}
           </Button>

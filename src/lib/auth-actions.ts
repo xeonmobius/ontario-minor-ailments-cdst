@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
+import { logAuditEvent } from "@/lib/audit-actions"
 
 export async function login(_prev: any, formData: FormData) {
   const supabase = await createClient()
@@ -12,9 +13,11 @@ export async function login(_prev: any, formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword({ email, password })
 
   if (error) {
+    await logAuditEvent("auth.login_failed")
     return { error: error.message }
   }
 
+  await logAuditEvent("auth.login")
   revalidatePath("/", "layout")
   redirect("/")
 }
@@ -89,6 +92,7 @@ export async function signup(_prev: any, formData: FormData) {
     }
   }
 
+  await logAuditEvent("auth.signup", { pharmacy_name: pharmacyName })
   revalidatePath("/", "layout")
   redirect("/")
 }
@@ -149,6 +153,7 @@ export async function signupWithInvite(formData: FormData) {
 
 export async function logout() {
   const supabase = await createClient()
+  await logAuditEvent("auth.logout")
   await supabase.auth.signOut()
   revalidatePath("/", "layout")
   redirect("/login")
@@ -183,6 +188,80 @@ export async function createInvitation(formData: FormData) {
     return { error: error.message }
   }
 
+  await logAuditEvent("team.invite_created", { invite_email: email })
   revalidatePath("/settings/team")
+  return { success: true }
+}
+
+export async function forgotPassword(_prev: any, formData: FormData) {
+  const supabase = await createClient()
+  const email = formData.get("email") as string
+
+  await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/reset-password`,
+  })
+
+  return { success: true }
+}
+
+export async function resetPassword(_prev: any, formData: FormData) {
+  const password = formData.get("password") as string
+  const confirmPassword = formData.get("confirmPassword") as string
+
+  if (password !== confirmPassword) {
+    return { error: "Passwords do not match" }
+  }
+
+  if (password.length < 8) {
+    return { error: "Password must be at least 8 characters" }
+  }
+
+  const supabase = await createClient()
+  const { error } = await supabase.auth.updateUser({ password })
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  await logAuditEvent("auth.password_change", { method: "reset_link" })
+  return { success: true }
+}
+
+export async function changePassword(_prev: any, formData: FormData) {
+  const currentPassword = formData.get("currentPassword") as string
+  const password = formData.get("password") as string
+  const confirmPassword = formData.get("confirmPassword") as string
+
+  if (password !== confirmPassword) {
+    return { error: "Passwords do not match" }
+  }
+
+  if (password.length < 8) {
+    return { error: "Password must be at least 8 characters" }
+  }
+
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getUser()
+
+  if (!userData.user?.email) {
+    return { error: "Not authenticated" }
+  }
+
+  const { error: reAuthError } = await supabase.auth.signInWithPassword({
+    email: userData.user.email,
+    password: currentPassword,
+  })
+
+  if (reAuthError) {
+    return { error: "Current password is incorrect" }
+  }
+
+  const { error } = await supabase.auth.updateUser({ password })
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  await logAuditEvent("auth.password_change", { method: "settings" })
   return { success: true }
 }

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { logAuditEvent } from "@/lib/audit-actions"
 
 export function PharmacyForm({
   pharmacy,
@@ -43,6 +44,11 @@ export function PharmacyForm({
         fax,
       })
       .eq("id", pharmacy.id)
+    await logAuditEvent("pharmacy.updated", { changed: ["name", "address", "city", "postal_code", "phone", "fax"].filter(f => {
+      const orig: Record<string, string> = { name: pharmacy.name, address: pharmacy.address, city: pharmacy.city, postal_code: pharmacy.postal_code, phone: pharmacy.phone, fax: pharmacy.fax }
+      const curr: Record<string, string> = { name, address, city, postal_code: postalCode, phone, fax }
+      return orig[f] !== curr[f]
+    }).join(",") })
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
   }

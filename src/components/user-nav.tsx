@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { LogOut, Settings, User, Users } from "lucide-react"
+import { LogOut, Settings, User, Users, KeyRound } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -49,6 +49,13 @@ export function UserNav({ profile }: { profile: Profile }) {
             >
               <Settings className="size-4" />
               Profile Settings
+            </Link>
+            <Link
+              href="/settings/password"
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-muted"
+            >
+              <KeyRound className="size-4" />
+              Change Password
             </Link>
             {isOwner && (
               <>

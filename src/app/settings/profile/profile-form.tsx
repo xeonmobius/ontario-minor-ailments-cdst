@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { logAuditEvent } from "@/lib/audit-actions"
 
 export function ProfileForm({
   defaults,
@@ -37,6 +38,11 @@ export function ProfileForm({
         registration_number: registrationNumber,
       })
       .eq("id", userId)
+    await logAuditEvent("profile.updated", { changed: ["full_name", "provincial_license", "province", "registration_number"].filter(f => {
+      const orig: Record<string, string> = { full_name: defaults?.full_name ?? "", provincial_license: defaults?.provincial_license ?? "", province: defaults?.province ?? "Ontario", registration_number: defaults?.registration_number ?? "" }
+      const curr: Record<string, string> = { full_name: fullName, provincial_license: provincialLicense, province, registration_number: registrationNumber }
+      return orig[f] !== curr[f]
+    }).join(",") }, "profile", userId)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
   }
