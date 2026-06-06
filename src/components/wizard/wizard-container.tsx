@@ -7,6 +7,9 @@ import { StepPatient } from "./step-patient"
 import { StepRedFlags } from "./step-redflags"
 import { StepRx } from "./step-rx"
 import { StepGenerate } from "./step-generate"
+import { ReferralPdf } from "./referral-pdf"
+import { downloadPdf } from "@/lib/pdf-helpers"
+import { Button } from "@/components/ui/button"
 
 const defaultPatient: PatientInfo = {
   name: "",
@@ -39,6 +42,9 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
   const [assessmentNotes, setAssessmentNotes] = useState("")
   const [selectedRx, setSelectedRx] = useState<SelectedRx | null>(null)
   const [nonRxChecked, setNonRxChecked] = useState<string[]>([])
+  const [isReferral, setIsReferral] = useState(false)
+
+  const hasRedFlags = redFlagsChecked.length > 0
 
   const canNext =
     step === 0
@@ -70,6 +76,23 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
 
   function handleSelectedRxChange(rx: SelectedRx) {
     setSelectedRx(rx)
+  }
+
+  function handleReferral() {
+    setIsReferral(true)
+    setStep(3)
+  }
+
+  function handleDownloadReferral() {
+    const dateOfAssessment = new Date().toLocaleDateString("en-CA")
+    const doc = <ReferralPdf
+      ailment={ailment}
+      patient={patient}
+      redFlagsChecked={redFlagsChecked}
+      dateOfAssessment={dateOfAssessment}
+      pharmacy={pharmacy}
+    />
+    downloadPdf(doc, `referral-${dateOfAssessment}.pdf`)
   }
 
   return (
@@ -113,7 +136,38 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
               onNonRxChange={setNonRxChecked}
             />
           )}
-          {step === 3 && selectedRx && (
+          {step === 3 && isReferral && (
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center gap-2">
+                <span className="text-destructive text-lg">⚠</span>
+                <h3 className="text-lg font-semibold">Referral Required</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">Red flag(s) detected — this patient must be referred to their primary care physician.</p>
+              <div className="bg-card border rounded-lg p-4">
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div><span className="font-semibold">Patient:</span> {patient.name}</div>
+                  <div><span className="font-semibold">DOB:</span> {patient.dob}</div>
+                  <div><span className="font-semibold">Ailment:</span> {ailment.name}</div>
+                  {patient.doctorName && <div><span className="font-semibold">Physician:</span> Dr. {patient.doctorName}</div>}
+                </div>
+                <div className="mt-3">
+                  <span className="font-semibold text-sm">Red Flags:</span>
+                  <ul className="mt-1 flex flex-col gap-1">
+                    {redFlagsChecked.map((flag) => (
+                      <li key={flag} className="text-sm text-destructive flex items-center gap-2">
+                        <span>⚠</span> {flag}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <Button variant="destructive" onClick={handleDownloadReferral}>
+                Download Referral PDF
+              </Button>
+              <p className="text-xs text-muted-foreground">Print, sign, and fax this referral to the patient's family physician.</p>
+            </div>
+          )}
+          {step === 3 && !isReferral && selectedRx && (
             <StepGenerate
               ailment={ailment}
               patient={patient}
@@ -127,7 +181,7 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
         </div>
       </div>
 
-      <WizardNav step={step} canNext={canNext} onBack={handleBack} onNext={handleNext} />
+      <WizardNav step={step} canNext={canNext} onBack={handleBack} onNext={handleNext} hasRedFlags={hasRedFlags && step === 1} onReferral={handleReferral} />
     </div>
   )
 }
