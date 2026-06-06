@@ -25,50 +25,26 @@ export async function signup(formData: FormData) {
   const password = formData.get("password") as string
   const fullName = formData.get("fullName") as string
 
-  const pharmacyData = {
-    name: formData.get("pharmacyName") as string,
-    address: formData.get("address") as string,
-    city: formData.get("city") as string,
-    province: "Ontario",
-    postal_code: formData.get("postalCode") as string,
-    phone: formData.get("phone") as string,
-    fax: (formData.get("fax") as string) || null,
-  }
-
-  const { data: authData, error: authError } = await supabase.auth.signUp({
+  const { error: authError } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      data: { full_name: fullName, role: "owner" },
+      data: {
+        full_name: fullName,
+        role: "owner",
+        pharmacy_name: formData.get("pharmacyName") as string,
+        address: formData.get("address") as string,
+        city: formData.get("city") as string,
+        province: "Ontario",
+        postal_code: formData.get("postalCode") as string,
+        phone: formData.get("phone") as string,
+        fax: (formData.get("fax") as string) || null,
+      },
     },
   })
 
   if (authError) {
     return { error: authError.message }
-  }
-
-  if (authData.user) {
-    const { data: pharmacy, error: pharmacyError } = await supabase
-      .from("pharmacies")
-      .insert({
-        ...pharmacyData,
-        created_by: authData.user.id,
-      })
-      .select("id")
-      .single()
-
-    if (pharmacyError) {
-      return { error: pharmacyError.message }
-    }
-
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .update({ pharmacy_id: pharmacy.id })
-      .eq("id", authData.user.id)
-
-    if (profileError) {
-      return { error: profileError.message }
-    }
   }
 
   revalidatePath("/", "layout")
