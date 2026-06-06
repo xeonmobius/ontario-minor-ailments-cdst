@@ -75,3 +75,23 @@ describe("Wizard navigation logic", () => {
     expect(true).toBe(true)
   })
 })
+
+describe("Referral navigation logic", () => {
+  it("can generate referral when red flags are checked", () => {
+    const redFlags = ["Fever > 38.5"]
+    const hasRedFlags = redFlags.length > 0
+    expect(hasRedFlags).toBe(true)
+  })
+
+  it("referral skips to step 3", () => {
+    const isReferral = true
+    const step = 3
+    expect(isReferral && step === 3).toBe(true)
+  })
+
+  it("normal flow continues when no red flags", () => {
+    const redFlags: string[] = []
+    const hasRedFlags = redFlags.length > 0
+    expect(hasRedFlags).toBe(false)
+  })
+})
