@@ -3,12 +3,14 @@ import Link from "next/link"
 import { getAilmentBySlug } from "@/lib/ailments"
 import { WizardContainer } from "@/components/wizard/wizard-container"
 import { Button } from "@/components/ui/button"
+import { requireAuth } from "@/lib/auth-guards"
 
 export default async function AssessPage({
   params,
 }: {
   params: Promise<{ ailment: string }>
 }) {
+  await requireAuth()
   const { ailment: slug } = await params
   const ailment = getAilmentBySlug(slug)
 
