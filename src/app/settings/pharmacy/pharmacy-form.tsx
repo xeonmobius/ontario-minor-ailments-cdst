@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,6 +28,7 @@ export function PharmacyForm({
   const [phone, setPhone] = useState(pharmacy.phone)
   const [fax, setFax] = useState(pharmacy.fax)
   const [saved, setSaved] = useState(false)
+  const router = useRouter()
 
   async function handleSave() {
     const supabase = createClient()
@@ -79,7 +81,10 @@ export function PharmacyForm({
           <Input id="fax" value={fax} onChange={(e) => setFax(e.target.value)} />
         </div>
       </div>
-      <Button onClick={handleSave}>{saved ? "Saved" : "Save"}</Button>
+      <div className="flex gap-2">
+        <Button variant="outline" onClick={() => router.back()}>Back</Button>
+        <Button onClick={handleSave}>{saved ? "Saved" : "Save"}</Button>
+      </div>
     </div>
   )
 }

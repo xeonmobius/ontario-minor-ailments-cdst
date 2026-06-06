@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -23,6 +24,7 @@ export function ProfileForm({
   const [province, setProvince] = useState(defaults?.province ?? "Ontario")
   const [registrationNumber, setRegistrationNumber] = useState(defaults?.registration_number ?? "")
   const [saved, setSaved] = useState(false)
+  const router = useRouter()
 
   async function handleSave() {
     const supabase = createClient()
@@ -57,7 +59,10 @@ export function ProfileForm({
         <Label htmlFor="registrationNumber">Registration Number</Label>
         <Input id="registrationNumber" value={registrationNumber} onChange={(e) => setRegistrationNumber(e.target.value)} />
       </div>
-      <Button onClick={handleSave}>{saved ? "Saved" : "Save"}</Button>
+      <div className="flex gap-2">
+        <Button variant="outline" onClick={() => router.back()}>Back</Button>
+        <Button onClick={handleSave}>{saved ? "Saved" : "Save"}</Button>
+      </div>
     </div>
   )
 }

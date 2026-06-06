@@ -1,7 +1,6 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useActionState } from "react"
 import Link from "next/link"
 import { signup } from "@/lib/auth-actions"
 import { Button } from "@/components/ui/button"
@@ -9,21 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 export default function SignupPage() {
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const router = useRouter()
-
-  async function handleSubmit(formData: FormData) {
-    setLoading(true)
-    setError(null)
-    const result = await signup(formData)
-    if (result?.error) {
-      setError(result.error)
-      setLoading(false)
-    } else {
-      router.push("/")
-    }
-  }
+  const [state, formAction, pending] = useActionState(signup, null)
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-6">
@@ -35,13 +20,13 @@ export default function SignupPage() {
           </p>
         </div>
 
-        {error && (
+        {(state as any)?.error && (
           <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-            {error}
+            {(state as any).error}
           </div>
         )}
 
-        <form action={handleSubmit} className="space-y-4">
+        <form action={formAction} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="fullName">Full Name</Label>
             <Input id="fullName" name="fullName" required />
@@ -87,8 +72,8 @@ export default function SignupPage() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Creating account..." : "Create account"}
+          <Button type="submit" className="w-full" disabled={pending}>
+            {pending ? "Creating account..." : "Create account"}
           </Button>
         </form>
 

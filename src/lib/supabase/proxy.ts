@@ -35,8 +35,9 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith(p),
   )
   const isInvite = request.nextUrl.pathname.startsWith("/invite/")
+  const isApi = request.nextUrl.pathname.startsWith("/api/")
 
-  if (!user && !isPublic && !isInvite) {
+  if (!user && !isPublic && !isInvite && !isApi) {
     const url = request.nextUrl.clone()
     url.pathname = "/login"
     const redirectResponse = NextResponse.redirect(url)

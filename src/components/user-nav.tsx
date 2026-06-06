@@ -1,8 +1,8 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { LogOut, Settings, User, Users } from "lucide-react"
-import { logout } from "@/lib/auth-actions"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -17,6 +17,13 @@ import type { Profile } from "@/types"
 
 export function UserNav({ profile }: { profile: Profile }) {
   const isOwner = profile.role === "owner"
+  const router = useRouter()
+
+  async function handleLogout() {
+    await fetch("/api/auth/logout", { method: "POST" })
+    router.push("/login")
+    router.refresh()
+  }
 
   return (
     <div className="flex items-center gap-2">
@@ -63,12 +70,14 @@ export function UserNav({ profile }: { profile: Profile }) {
             )}
           </nav>
           <DialogFooter>
-            <form action={logout}>
-              <DialogClose render={<Button variant="outline" className="w-full" />}>
-                <LogOut className="size-4 mr-2" />
-                Sign out
-              </DialogClose>
-            </form>
+            <DialogClose
+              render={
+                <Button variant="outline" className="w-full" onClick={handleLogout} />
+              }
+            >
+              <LogOut className="size-4 mr-2" />
+              Sign out
+            </DialogClose>
           </DialogFooter>
         </DialogContent>
       </Dialog>

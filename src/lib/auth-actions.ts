@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 
-export async function login(formData: FormData) {
+export async function login(_prev: any, formData: FormData) {
   const supabase = await createClient()
   const email = formData.get("email") as string
   const password = formData.get("password") as string
@@ -16,29 +16,35 @@ export async function login(formData: FormData) {
   }
 
   revalidatePath("/", "layout")
-  return { success: true }
+  redirect("/")
 }
 
-export async function signup(formData: FormData) {
+export async function signup(_prev: any, formData: FormData) {
   const supabase = await createClient()
   const email = formData.get("email") as string
   const password = formData.get("password") as string
   const fullName = formData.get("fullName") as string
+  const pharmacyName = formData.get("pharmacyName") as string
+  const address = formData.get("address") as string
+  const city = formData.get("city") as string
+  const postalCode = formData.get("postalCode") as string
+  const phone = formData.get("phone") as string
+  const fax = (formData.get("fax") as string) || null
 
-  const { error: authError } = await supabase.auth.signUp({
+  const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: {
         full_name: fullName,
         role: "owner",
-        pharmacy_name: formData.get("pharmacyName") as string,
-        address: formData.get("address") as string,
-        city: formData.get("city") as string,
+        pharmacy_name: pharmacyName,
+        address,
+        city,
         province: "Ontario",
-        postal_code: formData.get("postalCode") as string,
-        phone: formData.get("phone") as string,
-        fax: (formData.get("fax") as string) || null,
+        postal_code: postalCode,
+        phone,
+        fax,
       },
     },
   })
@@ -47,8 +53,44 @@ export async function signup(formData: FormData) {
     return { error: authError.message }
   }
 
+  if (authData.user) {
+    const { error: pharmError } = await supabase.from("pharmacies").insert({
+      name: pharmacyName,
+      address,
+      city,
+      province: "Ontario",
+      postal_code: postalCode,
+      phone,
+      fax,
+      created_by: authData.user.id,
+    }).select("id").single()
+
+    if (pharmError) {
+      console.error("Pharmacy insert error:", pharmError)
+    }
+
+    const { data: newPharmacy } = await supabase
+      .from("pharmacies")
+      .select("id")
+      .eq("created_by", authData.user.id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single()
+
+    if (newPharmacy) {
+      await supabase.from("profiles").upsert({
+        id: authData.user.id,
+        pharmacy_id: newPharmacy.id,
+        role: "owner",
+        full_name: fullName,
+        email,
+        province: "Ontario",
+      })
+    }
+  }
+
   revalidatePath("/", "layout")
-  return { success: true }
+  redirect("/")
 }
 
 export async function signupWithInvite(formData: FormData) {

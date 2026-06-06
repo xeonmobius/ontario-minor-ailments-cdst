@@ -1,7 +1,6 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useActionState } from "react"
 import Link from "next/link"
 import { login } from "@/lib/auth-actions"
 import { Button } from "@/components/ui/button"
@@ -9,21 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 export default function LoginPage() {
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const router = useRouter()
-
-  async function handleSubmit(formData: FormData) {
-    setLoading(true)
-    setError(null)
-    const result = await login(formData)
-    if (result?.error) {
-      setError(result.error)
-      setLoading(false)
-    } else {
-      router.push("/")
-    }
-  }
+  const [state, formAction, pending] = useActionState(login, null)
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-6">
@@ -35,13 +20,13 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {error && (
+        {(state as any)?.error && (
           <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-            {error}
+            {(state as any).error}
           </div>
         )}
 
-        <form action={handleSubmit} className="space-y-4">
+        <form action={formAction} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input id="email" name="email" type="email" required />
@@ -50,8 +35,8 @@ export default function LoginPage() {
             <Label htmlFor="password">Password</Label>
             <Input id="password" name="password" type="password" required />
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Signing in..." : "Sign in"}
+          <Button type="submit" className="w-full" disabled={pending}>
+            {pending ? "Signing in..." : "Sign in"}
           </Button>
         </form>
 
