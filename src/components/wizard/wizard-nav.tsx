@@ -50,9 +50,11 @@ interface WizardNavProps {
   canNext: boolean
   onBack: () => void
   onNext: () => void
+  hasRedFlags?: boolean
+  onReferral?: () => void
 }
 
-export function WizardNav({ step, canNext, onBack, onNext }: WizardNavProps) {
+export function WizardNav({ step, canNext, onBack, onNext, hasRedFlags, onReferral }: WizardNavProps) {
   const isFinished = step === 3
 
   return (
@@ -66,7 +68,11 @@ export function WizardNav({ step, canNext, onBack, onNext }: WizardNavProps) {
           Back
         </Button>
       )}
-      {!isFinished && (
+      {isFinished ? null : hasRedFlags && onReferral ? (
+        <Button variant="destructive" onClick={onReferral}>
+          Generate Referral
+        </Button>
+      ) : (
         <Button onClick={onNext} disabled={!canNext}>
           Next
         </Button>
