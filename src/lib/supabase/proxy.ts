@@ -28,8 +28,7 @@ export async function updateSession(request: NextRequest) {
     },
   )
 
-  const { data } = await supabase.auth.getClaims()
-  const user = data?.claims
+  const { data: { user } } = await supabase.auth.getUser()
 
   const publicPaths = ["/login", "/signup", "/auth"]
   const isPublic = publicPaths.some((p) =>
@@ -40,12 +39,6 @@ export async function updateSession(request: NextRequest) {
   if (!user && !isPublic && !isInvite) {
     const url = request.nextUrl.clone()
     url.pathname = "/login"
-    return NextResponse.redirect(url)
-  }
-
-  if (user && isPublic && !isInvite) {
-    const url = request.nextUrl.clone()
-    url.pathname = "/"
     return NextResponse.redirect(url)
   }
 
