@@ -42,9 +42,9 @@ export function ProfileForm({
         province,
       })
       .eq("id", userId)
-    await logAuditEvent("profile.updated", { changed: ["full_name", "provincial_license", "province", "registration_number"].filter(f => {
-      const orig: Record<string, string> = { full_name: defaults?.full_name ?? "", provincial_license: defaults?.provincial_license ?? "", province: defaults?.province ?? "Ontario", registration_number: defaults?.registration_number ?? "" }
-      const curr: Record<string, string> = { full_name: fullName, provincial_license: provincialLicense, province, registration_number: registrationNumber }
+    await logAuditEvent("profile.updated", { changed: ["full_name", "provincial_license", "province"].filter(f => {
+      const orig: Record<string, string> = { full_name: defaults?.full_name ?? "", provincial_license: defaults?.provincial_license ?? "", province: defaults?.province ?? "Ontario" }
+      const curr: Record<string, string> = { full_name: fullName, provincial_license: provincialLicense, province }
       return orig[f] !== curr[f]
     }).join(",") }, "profile", userId)
     setSaved(true)
