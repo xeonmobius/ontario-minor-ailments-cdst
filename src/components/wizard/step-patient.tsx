@@ -78,6 +78,8 @@ export function StepPatient({ patient, onChange }: StepPatientProps) {
             </div>
           )}
         </div>
+        <div className="flex flex-col gap-2">
+          <Label>Encounter Type *</Label>
           <div className="flex gap-4 pt-2">
             {["In-Person", "Virtual", "Phone"].map((option) => {
               const id = `encounter-${option.toLowerCase()}`
