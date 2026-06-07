@@ -143,6 +143,23 @@ export async function signupWithInvite(formData: FormData) {
     return { error: authError.message }
   }
 
+  if (authData.user) {
+    await supabase.from("profiles").upsert({
+      id: authData.user.id,
+      pharmacy_id: invite.pharmacy_id,
+      full_name: fullName,
+      email,
+      province,
+      provincial_license: provincialLicense,
+    })
+    await supabase.from("pharmacy_members").insert({
+      user_id: authData.user.id,
+      pharmacy_id: invite.pharmacy_id,
+      role: "pharmacist",
+    })
+    await supabase.from("invitations").update({ accepted_at: new Date().toISOString() }).eq("token", token)
+  }
+
   revalidatePath("/", "layout")
   return { success: true }
 }

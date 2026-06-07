@@ -9,15 +9,23 @@ export default async function TeamPage() {
   const supabase = await createClient()
 
   const { data: members } = await supabase
-    .from("profiles")
-    .select("id, full_name, email, role")
+    .from("pharmacy_members")
+    .select("id, role, profiles(id, full_name, email)")
     .eq("pharmacy_id", profile.pharmacyId)
+    .eq("is_active", true)
 
   const { data: invitations } = await supabase
     .from("invitations")
     .select("id, email, created_at, expires_at, accepted_at")
     .eq("pharmacy_id", profile.pharmacyId)
     .is("accepted_at", null)
+
+  const flatMembers = (members ?? []).map((m: any) => ({
+    id: m.id,
+    full_name: m.profiles?.full_name ?? "—",
+    email: m.profiles?.email ?? "—",
+    role: m.role,
+  }))
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -29,7 +37,7 @@ export default async function TeamPage() {
       </header>
       <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-8 space-y-8">
         <InviteForm />
-        <TeamList members={members ?? []} invitations={invitations ?? []} />
+        <TeamList members={flatMembers} invitations={invitations ?? []} />
       </main>
     </div>
   )
