@@ -14,7 +14,12 @@ interface StepPatientProps {
 
 export function StepPatient({ patient, onChange }: StepPatientProps) {
   function handleChange(field: keyof PatientInfo, value: string) {
-    onChange({ ...patient, [field]: value })
+    const update: Partial<PatientInfo> = { [field]: value }
+    if (field === "sex" && value !== "Female") {
+      update.pregnant = false
+      update.breastfeeding = false
+    }
+    onChange({ ...patient, ...update })
   }
 
   return (
@@ -62,16 +67,16 @@ export function StepPatient({ patient, onChange }: StepPatientProps) {
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="pregnant"
-                  checked={patient.pregnant}
-                  onCheckedChange={(checked) => onChange({ ...patient, pregnant: !!checked })}
+                  checked={!!patient.pregnant}
+                  onCheckedChange={(checked) => onChange({ ...patient, pregnant: checked === true })}
                 />
                 <Label htmlFor="pregnant" className="text-sm cursor-pointer">Pregnant</Label>
               </div>
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="breastfeeding"
-                  checked={patient.breastfeeding}
-                  onCheckedChange={(checked) => onChange({ ...patient, breastfeeding: !!checked })}
+                  checked={!!patient.breastfeeding}
+                  onCheckedChange={(checked) => onChange({ ...patient, breastfeeding: checked === true })}
                 />
                 <Label htmlFor="breastfeeding" className="text-sm cursor-pointer">Breastfeeding</Label>
               </div>
