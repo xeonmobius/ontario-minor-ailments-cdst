@@ -50,8 +50,10 @@ export default async function Home() {
               <p className="text-xs text-muted-foreground mt-0.5">Clinical Decision Support Tool — O. Reg. 256/24</p>
             </div>
           </div>
-          <UserNav profile={profile} />
-          <PharmacyBadge pharmacyName={pharmacyName} pharmacyId={profile.pharmacyId} memberships={memberships} />
+          <div className="flex items-center gap-2">
+            <PharmacyBadge pharmacyName={pharmacyName} pharmacyId={profile.pharmacyId} memberships={memberships} />
+            <UserNav profile={profile} />
+          </div>
         </div>
       </header>
       <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-8">
