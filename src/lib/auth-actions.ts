@@ -57,37 +57,33 @@ export async function signup(_prev: any, formData: FormData) {
   }
 
   if (authData.user) {
-    const { error: pharmError } = await supabase.from("pharmacies").insert({
-      name: pharmacyName,
-      address,
-      city,
-      province: "Ontario",
-      postal_code: postalCode,
-      phone,
-      fax,
-      created_by: authData.user.id,
-    }).select("id").single()
-
-    if (pharmError) {
-      console.error("Pharmacy insert error:", pharmError)
-    }
-
     const { data: newPharmacy } = await supabase
       .from("pharmacies")
+      .insert({
+        name: pharmacyName,
+        address,
+        city,
+        province: "Ontario",
+        postal_code: postalCode,
+        phone,
+        fax,
+        created_by: authData.user.id,
+      })
       .select("id")
-      .eq("created_by", authData.user.id)
-      .order("created_at", { ascending: false })
-      .limit(1)
       .single()
 
     if (newPharmacy) {
       await supabase.from("profiles").upsert({
         id: authData.user.id,
         pharmacy_id: newPharmacy.id,
-        role: "owner",
         full_name: fullName,
         email,
         province: "Ontario",
+      })
+      await supabase.from("pharmacy_members").insert({
+        user_id: authData.user.id,
+        pharmacy_id: newPharmacy.id,
+        role: "owner",
       })
     }
   }
@@ -164,11 +160,23 @@ export async function createInvitation(formData: FormData) {
   const email = formData.get("email") as string
   const { data: profile } = await supabase
     .from("profiles")
-    .select("pharmacy_id, role")
+    .select("pharmacy_id")
     .eq("id", (await supabase.auth.getUser()).data.user?.id)
     .single()
 
-  if (!profile || profile.role !== "owner") {
+  if (!profile?.pharmacy_id) {
+    return { error: "No active pharmacy." }
+  }
+
+  const { data: membership } = await supabase
+    .from("pharmacy_members")
+    .select("role")
+    .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
+    .eq("pharmacy_id", profile.pharmacy_id)
+    .eq("is_active", true)
+    .single()
+
+  if (!membership || membership.role !== "owner") {
     return { error: "Only owners can invite pharmacists." }
   }
 

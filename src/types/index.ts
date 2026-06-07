@@ -66,18 +66,29 @@ export interface AssessmentData {
   dateOfAssessment: string
 }
 
-export type UserRole = "owner" | "pharmacist" | "platform_admin"
+export type UserRole = "owner" | "pharmacist"
+export type PharmacyMemberRole = "owner" | "pharmacist"
 
 export interface Profile {
   id: string
   pharmacyId: string | null
-  role: UserRole
+  activeRole: PharmacyMemberRole | null
+  isPlatformAdmin: boolean
   fullName: string
   email: string
   province: string | null
   provincialLicense: string | null
-  registrationNumber: string | null
   createdAt: string
+}
+
+export interface PharmacyMember {
+  id: string
+  userId: string
+  pharmacyId: string
+  role: PharmacyMemberRole
+  isActive: boolean
+  createdAt: string
+  pharmacyName?: string
 }
 
 export interface Pharmacy {
@@ -99,7 +110,7 @@ export interface Invitation {
   id: string
   pharmacyId: string
   email: string
-  role: UserRole
+  role: UserRole | "platform_admin"
   token: string
   acceptedAt: string | null
   expiresAt: string

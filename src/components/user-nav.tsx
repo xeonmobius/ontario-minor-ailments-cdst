@@ -16,7 +16,7 @@ import {
 import type { Profile } from "@/types"
 
 export function UserNav({ profile }: { profile: Profile }) {
-  const isOwner = profile.role === "owner"
+  const isOwner = profile.activeRole === "owner"
   const router = useRouter()
 
   async function handleLogout() {

@@ -23,7 +23,7 @@ export default async function AssessPage({
 
   const { data: pharmacy } = await supabase
     .from("pharmacies")
-    .select("name, address, city, province, postal_code, phone, fax")
+    .select("name, address, city, province, postal_code, phone, fax, accreditation_number")
     .eq("id", profile.pharmacyId)
     .single()
 
@@ -38,7 +38,7 @@ export default async function AssessPage({
         fax: pharmacy.fax ?? "",
         pharmacistName: profile.fullName ?? "",
         provincialLicense: profile.provincialLicense ?? "",
-        registrationNumber: profile.registrationNumber ?? "",
+        registrationNumber: pharmacy.accreditation_number ?? "",
       }
     : null
 
