@@ -30,6 +30,10 @@ export function ProfileForm({
   const [email, setEmail] = useState(currentEmail)
   const [currentPassword, setCurrentPassword] = useState("")
   const [emailStatus, setEmailStatus] = useState<{ success?: boolean; error?: string } | null>(null)
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [passwordCurrentPassword, setPasswordCurrentPassword] = useState("")
+  const [passwordStatus, setPasswordStatus] = useState<{ success?: boolean; error?: string } | null>(null)
   const router = useRouter()
 
   async function handleSave() {
@@ -82,6 +86,46 @@ export function ProfileForm({
     setCurrentPassword("")
   }
 
+  async function handlePasswordChange() {
+    setPasswordStatus(null)
+
+    if (newPassword.length < 8) {
+      setPasswordStatus({ error: "Password must be at least 8 characters" })
+      return
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordStatus({ error: "Passwords do not match" })
+      return
+    }
+
+    const supabase = createClient()
+    const { data: userData } = await supabase.auth.getUser()
+    if (!userData.user?.email) return
+
+    const { error: reAuthError } = await supabase.auth.signInWithPassword({
+      email: userData.user.email,
+      password: passwordCurrentPassword,
+    })
+
+    if (reAuthError) {
+      setPasswordStatus({ error: "Current password is incorrect" })
+      return
+    }
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    if (error) {
+      setPasswordStatus({ error: error.message })
+      return
+    }
+
+    await logAuditEvent("auth.password_change", {})
+    setPasswordStatus({ success: true })
+    setNewPassword("")
+    setConfirmPassword("")
+    setPasswordCurrentPassword("")
+  }
+
   return (
     <div className="space-y-4 max-w-md">
       <div className="space-y-2">
@@ -121,6 +165,32 @@ export function ProfileForm({
         <Input id="currentPasswordForEmail" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
       </div>
       <Button variant="outline" onClick={handleEmailChange}>Update Email</Button>
+
+      <Separator />
+      <p className="text-sm font-medium text-muted-foreground">Change Password</p>
+      {passwordStatus?.error && (
+        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+          {passwordStatus.error}
+        </div>
+      )}
+      {passwordStatus?.success && (
+        <div className="rounded-md bg-green-100 p-3 text-sm text-green-800">
+          Password updated successfully.
+        </div>
+      )}
+      <div className="space-y-2">
+        <Label htmlFor="passwordCurrentPassword">Current Password</Label>
+        <Input id="passwordCurrentPassword" type="password" value={passwordCurrentPassword} onChange={(e) => setPasswordCurrentPassword(e.target.value)} />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="newPassword">New Password</Label>
+        <Input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="confirmPassword">Confirm New Password</Label>
+        <Input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+      </div>
+      <Button variant="outline" onClick={handlePasswordChange}>Update Password</Button>
     </div>
   )
 }
