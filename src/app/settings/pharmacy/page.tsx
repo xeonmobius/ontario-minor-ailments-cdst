@@ -9,7 +9,7 @@ export default async function PharmacySettingsPage() {
 
   const { data: pharmacy } = await supabase
     .from("pharmacies")
-    .select("id, name, address, city, province, postal_code, phone, fax")
+    .select("id, name, address, city, province, postal_code, phone, fax, accreditation_number")
     .eq("id", profile.pharmacyId)
     .single()
 

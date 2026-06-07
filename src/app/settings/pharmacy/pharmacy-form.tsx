@@ -20,6 +20,7 @@ export function PharmacyForm({
     postal_code: string
     phone: string
     fax: string
+    accreditation_number: string | null
   }
 }) {
   const [name, setName] = useState(pharmacy.name)
@@ -28,6 +29,7 @@ export function PharmacyForm({
   const [postalCode, setPostalCode] = useState(pharmacy.postal_code)
   const [phone, setPhone] = useState(pharmacy.phone)
   const [fax, setFax] = useState(pharmacy.fax)
+  const [accreditationNumber, setAccreditationNumber] = useState(pharmacy.accreditation_number ?? "")
   const [saved, setSaved] = useState(false)
   const router = useRouter()
 
@@ -42,11 +44,12 @@ export function PharmacyForm({
         postal_code: postalCode,
         phone,
         fax,
+        accreditation_number: accreditationNumber,
       })
       .eq("id", pharmacy.id)
-    await logAuditEvent("pharmacy.updated", { changed: ["name", "address", "city", "postal_code", "phone", "fax"].filter(f => {
-      const orig: Record<string, string> = { name: pharmacy.name, address: pharmacy.address, city: pharmacy.city, postal_code: pharmacy.postal_code, phone: pharmacy.phone, fax: pharmacy.fax }
-      const curr: Record<string, string> = { name, address, city, postal_code: postalCode, phone, fax }
+    await logAuditEvent("pharmacy.updated", { changed: ["name", "address", "city", "postal_code", "phone", "fax", "accreditation_number"].filter(f => {
+      const orig: Record<string, string> = { name: pharmacy.name, address: pharmacy.address, city: pharmacy.city, postal_code: pharmacy.postal_code, phone: pharmacy.phone, fax: pharmacy.fax, accreditation_number: pharmacy.accreditation_number ?? "" }
+      const curr: Record<string, string> = { name, address, city, postal_code: postalCode, phone, fax, accreditation_number: accreditationNumber }
       return orig[f] !== curr[f]
     }).join(",") })
     setSaved(true)
@@ -77,7 +80,10 @@ export function PharmacyForm({
         <Label htmlFor="province">Province</Label>
         <Input id="province" value={pharmacy.province} disabled />
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-2">
+        <Label htmlFor="accreditationNumber">Pharmacy Accreditation Number</Label>
+        <Input id="accreditationNumber" value={accreditationNumber} onChange={(e) => setAccreditationNumber(e.target.value)} />
+      </div>
         <div className="space-y-2">
           <Label htmlFor="phone">Phone</Label>
           <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
