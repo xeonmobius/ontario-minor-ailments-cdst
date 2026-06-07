@@ -84,6 +84,7 @@ export function PharmacyForm({
         <Label htmlFor="accreditationNumber">Pharmacy Accreditation Number</Label>
         <Input id="accreditationNumber" value={accreditationNumber} onChange={(e) => setAccreditationNumber(e.target.value)} />
       </div>
+      <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2">
           <Label htmlFor="phone">Phone</Label>
           <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
