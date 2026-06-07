@@ -59,6 +59,24 @@ export function StepPatient({ patient, onChange }: StepPatientProps) {
           </div>
         </div>
         <div className="flex flex-col gap-2">
+          <Label>Encounter Type *</Label>
+          <div className="flex gap-4 pt-2">
+            {["In-Person", "Virtual", "Phone"].map((option) => {
+              const id = `encounter-${option.toLowerCase()}`
+              return (
+                <div key={option} className="flex items-center gap-2">
+                  <Checkbox
+                    id={id}
+                    checked={patient.encounterType === option}
+                    onCheckedChange={() => handleChange("encounterType", patient.encounterType === option ? "" : option)}
+                  />
+                  <Label htmlFor={id} className="text-sm cursor-pointer">{option}</Label>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+        <div className="flex flex-col gap-2">
           <Label htmlFor="ohip">OHIP Number</Label>
           <Input
             id="ohip"

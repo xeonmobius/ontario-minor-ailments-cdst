@@ -31,6 +31,7 @@ export interface PatientInfo {
   doctorPhone: string
   doctorFax: string
   doctorAddress: string
+  encounterType: string
 }
 
 export interface PharmacyDefaults {

@@ -39,6 +39,18 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
   },
   subtitle: { fontSize: 7, color: MUTED, marginTop: 1 },
+  ailmentBanner: {
+    fontSize: 9,
+    fontFamily: "Helvetica-Bold",
+    color: "#ffffff",
+    backgroundColor: TEAL,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 2,
+    marginBottom: 4,
+    marginTop: 2,
+    alignSelf: "flex-start",
+  },
   confidentialBadge: {
     fontSize: 6,
     fontFamily: "Helvetica-Bold",
@@ -187,6 +199,8 @@ export function CombinedPdf({
 
         <View style={styles.divider} />
 
+        <Text style={styles.ailmentBanner}>{ailment.name}</Text>
+
         {pharmacy && (
           <View style={styles.pharmacyBlock}>
             <Text style={styles.pharmacyName}>{pharmacy.pharmacyName || "Pharmacy Name"}</Text>
@@ -215,6 +229,7 @@ export function CombinedPdf({
             <Text style={styles.sectionLabel}>Assessment</Text>
             <View style={styles.fieldRow}><Text style={styles.label}>Ailment</Text><Text style={styles.value}>{ailment.name}</Text></View>
             <View style={styles.fieldRow}><Text style={styles.label}>Date</Text><Text style={styles.value}>{dateOfAssessment}</Text></View>
+            {patient.encounterType && <View style={styles.fieldRow}><Text style={styles.label}>Encounter</Text><Text style={styles.value}>{patient.encounterType}</Text></View>}
             <View style={styles.fieldRow}><Text style={styles.label}>Red flags</Text><Text style={styles.value}>None identified</Text></View>
             {selectedRx.duration && <View style={styles.fieldRow}><Text style={styles.label}>Duration</Text><Text style={styles.value}>{selectedRx.duration}</Text></View>}
             <View style={styles.fieldRow}><Text style={styles.label}>Follow-up</Text><Text style={styles.value}>{ailment.followUp}</Text></View>

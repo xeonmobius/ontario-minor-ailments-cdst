@@ -27,6 +27,7 @@ const defaultPatient: PatientInfo = {
   doctorPhone: "",
   doctorFax: "",
   doctorAddress: "",
+  encounterType: "",
 }
 
 interface WizardContainerProps {
