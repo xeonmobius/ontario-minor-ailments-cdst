@@ -26,7 +26,6 @@ export function ProfileForm({
   const [fullName, setFullName] = useState(defaults?.full_name ?? "")
   const [provincialLicense, setProvincialLicense] = useState(defaults?.provincial_license ?? "")
   const [province, setProvince] = useState(defaults?.province ?? "Ontario")
-  const [registrationNumber, setRegistrationNumber] = useState(defaults?.registration_number ?? "")
   const [saved, setSaved] = useState(false)
   const [email, setEmail] = useState(currentEmail)
   const [currentPassword, setCurrentPassword] = useState("")
@@ -41,7 +40,6 @@ export function ProfileForm({
         full_name: fullName,
         provincial_license: provincialLicense,
         province,
-        registration_number: registrationNumber,
       })
       .eq("id", userId)
     await logAuditEvent("profile.updated", { changed: ["full_name", "provincial_license", "province", "registration_number"].filter(f => {
@@ -91,16 +89,12 @@ export function ProfileForm({
         <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="provincialLicense">Provincial License</Label>
+        <Label htmlFor="provincialLicense">Provincial License Number</Label>
         <Input id="provincialLicense" value={provincialLicense} onChange={(e) => setProvincialLicense(e.target.value)} />
       </div>
       <div className="space-y-2">
         <Label htmlFor="province">Province</Label>
         <Input id="province" value={province} onChange={(e) => setProvince(e.target.value)} />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="registrationNumber">Registration Number</Label>
-        <Input id="registrationNumber" value={registrationNumber} onChange={(e) => setRegistrationNumber(e.target.value)} />
       </div>
       <div className="flex gap-2">
         <Button variant="outline" onClick={() => router.back()}>Back</Button>
