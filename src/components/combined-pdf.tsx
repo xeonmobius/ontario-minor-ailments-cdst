@@ -224,6 +224,8 @@ export function CombinedPdf({
             {patient.phone && <View style={styles.fieldRow}><Text style={styles.label}>Phone</Text><Text style={styles.value}>{patient.phone}</Text></View>}
             <View style={styles.fieldRow}><Text style={styles.label}>Allergies</Text><Text style={styles.value}>{patient.allergies}</Text></View>
             {patient.currentMeds && <View style={styles.fieldRow}><Text style={styles.label}>Meds</Text><Text style={styles.value}>{patient.currentMeds}</Text></View>}
+            {patient.pregnant && <View style={styles.fieldRow}><Text style={styles.label}>Status</Text><Text style={{ fontSize: 7.5, color: "#b91c1c" }}>Pregnant</Text></View>}
+            {patient.breastfeeding && <View style={styles.fieldRow}><Text style={styles.label}>Status</Text><Text style={{ fontSize: 7.5, color: "#b91c1c" }}>Breastfeeding</Text></View>}
           </View>
           <View style={styles.col}>
             <Text style={styles.sectionLabel}>Assessment</Text>

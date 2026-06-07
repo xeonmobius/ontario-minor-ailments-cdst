@@ -57,9 +57,27 @@ export function StepPatient({ patient, onChange }: StepPatientProps) {
               )
             })}
           </div>
+          {patient.sex === "Female" && (
+            <div className="flex gap-6 pt-3">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="pregnant"
+                  checked={patient.pregnant}
+                  onCheckedChange={(checked) => onChange({ ...patient, pregnant: !!checked })}
+                />
+                <Label htmlFor="pregnant" className="text-sm cursor-pointer">Pregnant</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="breastfeeding"
+                  checked={patient.breastfeeding}
+                  onCheckedChange={(checked) => onChange({ ...patient, breastfeeding: !!checked })}
+                />
+                <Label htmlFor="breastfeeding" className="text-sm cursor-pointer">Breastfeeding</Label>
+              </div>
+            </div>
+          )}
         </div>
-        <div className="flex flex-col gap-2">
-          <Label>Encounter Type *</Label>
           <div className="flex gap-4 pt-2">
             {["In-Person", "Virtual", "Phone"].map((option) => {
               const id = `encounter-${option.toLowerCase()}`

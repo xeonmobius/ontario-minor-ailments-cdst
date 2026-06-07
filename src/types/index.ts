@@ -32,6 +32,8 @@ export interface PatientInfo {
   doctorFax: string
   doctorAddress: string
   encounterType: string
+  pregnant: boolean
+  breastfeeding: boolean
 }
 
 export interface PharmacyDefaults {

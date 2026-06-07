@@ -28,6 +28,8 @@ const defaultPatient: PatientInfo = {
   doctorFax: "",
   doctorAddress: "",
   encounterType: "",
+  pregnant: false,
+  breastfeeding: false,
 }
 
 interface WizardContainerProps {
