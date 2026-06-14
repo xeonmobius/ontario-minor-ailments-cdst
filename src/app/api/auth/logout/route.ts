@@ -7,13 +7,13 @@ export async function POST() {
   await supabase.auth.signOut()
 
   const cookieResponse = getResponseWithCookies()
-  const response = NextResponse.json({ success: true })
-
-  if (cookieResponse) {
-    cookieResponse.cookies.getAll().forEach((c) => {
-      response.cookies.set(c.name, c.value, c as any)
-    })
+  if (!cookieResponse) {
+    return NextResponse.json({ success: true })
   }
 
+  const response = NextResponse.json({ success: true })
+  cookieResponse.cookies.getAll().forEach((c) => {
+    response.cookies.set(c.name, c.value, c)
+  })
   return response
 }
