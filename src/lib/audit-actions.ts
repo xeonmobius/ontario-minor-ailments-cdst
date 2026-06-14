@@ -36,11 +36,28 @@ export async function logAuditEvent(
 
 export async function getAuditLog(limit = 100, offset = 0) {
   const supabase = await createClient()
-  const { data } = await supabase
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("pharmacy_id, is_platform_admin")
+    .eq("id", user.id)
+    .single()
+
+  if (!profile) return []
+
+  let query = supabase
     .schema("audit")
     .from("log")
     .select("id, event_type, actor_id, pharmacy_id, resource_type, resource_id, metadata, created_at")
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1)
+
+  if (!profile.is_platform_admin) {
+    query = query.eq("pharmacy_id", profile.pharmacy_id)
+  }
+
+  const { data } = await query
   return data ?? []
 }
