@@ -1,7 +1,7 @@
 # Fly.io deployment config for CDST (Clinical Decision Support Tool)
 # Canadian region (yyz = Toronto) for PHIPA data residency
 
-app = "cdst-app"
+app = "cdst"
 primary_region = "yyz"
 
 [build]
@@ -26,7 +26,3 @@ primary_region = "yyz"
   memory = "512mb"
   cpu_kind = "shared"
   cpus = 1
-
-[[vm.mounts]]
-  source = "cdst_data"
-  destination = "/data"
