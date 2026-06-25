@@ -1,6 +1,7 @@
 import { Pool } from "pg"
 
 let pool: Pool | null = null
+let migrated = false
 
 export function isPhiEnabled(): boolean {
   return process.env.PHI_PERSIST_ENABLED === "true"
@@ -23,11 +24,49 @@ export function getPool(): Pool {
   return pool
 }
 
+async function ensureSchema() {
+  if (migrated) return
+  const client = await getPool().connect()
+  try {
+    await client.query(`
+      CREATE SCHEMA IF NOT EXISTS phi;
+      CREATE TABLE IF NOT EXISTS phi.assessments (
+        id                  TEXT PRIMARY KEY,
+        patient_hash        TEXT NOT NULL,
+        patient_name        TEXT NOT NULL,
+        patient_dob         TEXT NOT NULL,
+        patient_sex         TEXT,
+        patient_ohip        TEXT,
+        ailment_id          TEXT NOT NULL,
+        ailment_name        TEXT NOT NULL,
+        tx_id               TEXT NOT NULL,
+        red_flags_checked   TEXT[] DEFAULT '{}',
+        has_red_flag        BOOLEAN NOT NULL DEFAULT FALSE,
+        symptoms_checked    TEXT[] DEFAULT '{}',
+        assessment_notes    TEXT DEFAULT '',
+        selected_rx         JSONB,
+        non_rx_checked      TEXT[] DEFAULT '{}',
+        is_referral         BOOLEAN NOT NULL DEFAULT FALSE,
+        pharmacist_id       TEXT NOT NULL,
+        pharmacy_id         TEXT NOT NULL,
+        created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+      CREATE INDEX IF NOT EXISTS idx_assessments_pharmacy ON phi.assessments (pharmacy_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_assessments_patient   ON phi.assessments (patient_hash);
+      CREATE INDEX IF NOT EXISTS idx_assessments_tx         ON phi.assessments (tx_id);
+    `)
+    migrated = true
+  } finally {
+    client.release()
+  }
+}
+
 export async function query<T extends Record<string, unknown> = Record<string, unknown>>(
   text: string,
   params: unknown[] = [],
 ): Promise<T[]> {
   if (!isPhiEnabled()) return []
+  await ensureSchema()
   const client = await getPool().connect()
   try {
     const result = await client.query<T>(text, params)
