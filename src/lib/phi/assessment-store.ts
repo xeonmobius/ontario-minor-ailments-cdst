@@ -3,7 +3,13 @@
 import { query, isPhiEnabled } from "./db"
 import { patientHash, generateRecordId } from "./identity"
 import { requireAuth } from "@/lib/auth-guards"
-import type { PatientInfo, SelectedRx } from "@/types"
+import type {
+  AbandonmentReason,
+  AssessmentOutcome,
+  NonPrescribeReason,
+  PatientInfo,
+  SelectedRx,
+} from "@/types"
 
 export interface SaveAssessmentInput {
   patient: PatientInfo
@@ -17,7 +23,23 @@ export interface SaveAssessmentInput {
   selectedRx: SelectedRx | null
   nonRxChecked: string[]
   isReferral: boolean
+  outcome?: AssessmentOutcome
+  nonPrescribeReason?: NonPrescribeReason
+  nonPrescribeRationale?: string
+  abandonmentReason?: AbandonmentReason
+  reasonTaxonomyVersion?: string
+  reasonTaxonomyHash?: string
 }
+
+const VALID_NON_PRESCRIBE_REASONS: NonPrescribeReason[] = [
+  "patient_declined",
+  "otc_sufficient",
+  "clinical_judgment",
+  "already_treating",
+  "referred_to_physician",
+  "referred_elsewhere",
+  "other",
+]
 
 export async function saveAssessment(input: SaveAssessmentInput): Promise<{ id?: string; error?: string }> {
   if (!isPhiEnabled()) {
@@ -29,8 +51,19 @@ export async function saveAssessment(input: SaveAssessmentInput): Promise<{ id?:
     return { error: "No pharmacy associated with this account." }
   }
 
+  if (input.outcome === "not_prescribed") {
+    if (!input.nonPrescribeReason || !VALID_NON_PRESCRIBE_REASONS.includes(input.nonPrescribeReason)) {
+      return { error: "not_prescribed outcome requires a valid nonPrescribeReason." }
+    }
+    if (input.nonPrescribeReason === "other" && !input.nonPrescribeRationale?.trim()) {
+      return { error: 'nonPrescribeReason "other" requires a rationale.' }
+    }
+  }
+
   const id = generateRecordId()
   const pid = patientHash(input.patient.name, input.patient.dob)
+  const outcome: AssessmentOutcome =
+    input.outcome ?? (input.isReferral ? "referred" : "prescribed")
 
   try {
     await query(
@@ -40,6 +73,8 @@ export async function saveAssessment(input: SaveAssessmentInput): Promise<{ id?:
         red_flags_checked, has_red_flag, symptoms_checked, assessment_notes,
         selected_rx, non_rx_checked, is_referral,
         pharmacist_id, pharmacy_id,
+        outcome, non_prescribe_reason, non_prescribe_rationale,
+        abandonment_reason, reason_taxonomy_version, reason_taxonomy_hash,
         created_at
       ) VALUES (
         $1, $2, $3, $4, $5, $6,
@@ -47,6 +82,8 @@ export async function saveAssessment(input: SaveAssessmentInput): Promise<{ id?:
         $10, $11, $12, $13,
         $14, $15, $16,
         $17, $18,
+        $19, $20, $21,
+        $22, $23, $24,
         NOW()
       )`,
       [
@@ -68,6 +105,12 @@ export async function saveAssessment(input: SaveAssessmentInput): Promise<{ id?:
         input.isReferral,
         profile.id,
         profile.pharmacyId,
+        outcome,
+        input.nonPrescribeReason ?? null,
+        input.nonPrescribeRationale ?? null,
+        input.abandonmentReason ?? null,
+        input.reasonTaxonomyVersion ?? null,
+        input.reasonTaxonomyHash ?? null,
       ],
     )
     return { id }

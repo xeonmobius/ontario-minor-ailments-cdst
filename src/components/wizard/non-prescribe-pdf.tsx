@@ -7,15 +7,16 @@ import {
   View,
   StyleSheet,
 } from "@react-pdf/renderer"
-import { Ailment, PatientInfo, PharmacyDefaults } from "@/types"
+import { Ailment, NonPrescribeReason, PatientInfo, PharmacyDefaults } from "@/types"
+import { filterCheckedItems } from "@/lib/pdf-filter"
 
 const TEAL = "#1a6b6b"
 const TEAL_LIGHT = "#e6f2f2"
-const RED = "#b91c1c"
-const RED_LIGHT = "#fef2f2"
 const DARK = "#1a1a1a"
 const MUTED = "#555555"
 const BORDER = "#cccccc"
+const GREEN = "#2d7d3f"
+const GREEN_LIGHT = "#edf7ed"
 
 const styles = StyleSheet.create({
   page: {
@@ -34,7 +35,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 12,
     fontFamily: "Helvetica-Bold",
-    color: RED,
+    color: TEAL,
     letterSpacing: 1.5,
   },
   subtitle: { fontSize: 7, color: MUTED, marginTop: 1 },
@@ -42,7 +43,7 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontFamily: "Helvetica-Bold",
     color: "#ffffff",
-    backgroundColor: RED,
+    backgroundColor: TEAL,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 2,
@@ -53,9 +54,9 @@ const styles = StyleSheet.create({
   confidentialBadge: {
     fontSize: 6,
     fontFamily: "Helvetica-Bold",
-    color: RED,
+    color: TEAL,
     borderWidth: 1,
-    borderColor: RED,
+    borderColor: TEAL,
     borderRadius: 2,
     paddingHorizontal: 5,
     paddingVertical: 1.5,
@@ -63,7 +64,7 @@ const styles = StyleSheet.create({
   dateText: { fontSize: 7, color: MUTED, marginTop: 2, textAlign: "right" },
   divider: {
     borderBottomWidth: 1.5,
-    borderBottomColor: RED,
+    borderBottomColor: TEAL,
     marginVertical: 4,
   },
   pharmacyBlock: {
@@ -77,7 +78,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 6.5,
     fontFamily: "Helvetica-Bold",
-    color: RED,
+    color: TEAL,
     textTransform: "uppercase",
     letterSpacing: 1,
     marginBottom: 2,
@@ -88,20 +89,16 @@ const styles = StyleSheet.create({
   fieldRow: { flexDirection: "row", marginBottom: 1 },
   label: { fontFamily: "Helvetica-Bold", fontSize: 7.5, width: 52, color: DARK },
   value: { fontSize: 7.5, flex: 1 },
-  redFlagItem: {
-    flexDirection: "row",
-    marginBottom: 1,
-  },
-  redBullet: { width: 10, fontSize: 7, fontFamily: "Helvetica-Bold", color: RED },
-  redBulletText: { fontSize: 7, flex: 1 },
-  redBlock: {
-    backgroundColor: RED_LIGHT,
+  checkItem: { flexDirection: "row", marginBottom: 1 },
+  bullet: { width: 10, fontSize: 7, fontFamily: "Helvetica-Bold" },
+  bulletText: { fontSize: 7, flex: 1 },
+  reasonBlock: {
+    backgroundColor: GREEN_LIGHT,
     padding: 3,
     borderRadius: 2,
-    borderWidth: 0.5,
-    borderColor: "#fca5a5",
     marginBottom: 3,
   },
+  reasonLabel: { fontSize: 7.5, fontFamily: "Helvetica-Bold", color: GREEN },
   notesBlock: {
     backgroundColor: "#f9f9f9",
     padding: 3,
@@ -110,14 +107,11 @@ const styles = StyleSheet.create({
     borderColor: "#eeeeee",
     marginBottom: 3,
   },
-  patientSectionLabel: {
-    fontSize: 6.5,
-    fontFamily: "Helvetica-Bold",
-    color: TEAL,
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    marginBottom: 2,
-    marginTop: 3,
+  greenBlock: {
+    backgroundColor: GREEN_LIGHT,
+    padding: 3,
+    borderRadius: 2,
+    marginBottom: 3,
   },
   signatureSection: {
     flexDirection: "row",
@@ -149,33 +143,49 @@ const styles = StyleSheet.create({
   footerText: { fontSize: 5, color: MUTED, textAlign: "center", marginTop: 2 },
 })
 
-interface ReferralPdfProps {
+interface NonPrescribePdfProps {
   ailment: Ailment
   patient: PatientInfo
-  redFlagsChecked: string[]
+  reason: NonPrescribeReason
+  reasonLabel: string
+  rationale: string
+  nonRxChecked: string[]
+  assessmentNotes: string
   dateOfAssessment: string
   pharmacy: PharmacyDefaults | null
-  referralContext?: "red_flag" | "non_red_flag"
-  referralReason?: string
+  consentSignerName?: string
+  consentSignerRelationship?: string
+  consentCaptureMethod?: string
+  consentStatementVersion?: string
+  consentCapturedAt?: string
 }
 
-export function ReferralPdf({
+export function NonPrescribePdf({
   ailment,
   patient,
-  redFlagsChecked,
+  reasonLabel,
+  rationale,
+  nonRxChecked,
+  assessmentNotes,
   dateOfAssessment,
   pharmacy,
-  referralContext = "red_flag",
-  referralReason,
-}: ReferralPdfProps) {
-  const isNonRedFlag = referralContext === "non_red_flag"
+  consentSignerName,
+  consentSignerRelationship,
+  consentCaptureMethod,
+  consentStatementVersion,
+  consentCapturedAt,
+}: NonPrescribePdfProps) {
+  const activeNonRx = filterCheckedItems(ailment.nonRx, nonRxChecked)
+
   return (
     <Document>
       <Page size="LETTER" style={styles.page}>
         <View style={styles.headerRow}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.title}>REFERRAL</Text>
-            <Text style={styles.subtitle}>{ailment.name} — O. Reg. 256/24</Text>
+            <Text style={styles.title}>ASSESSMENT RECORD</Text>
+            <Text style={styles.subtitle}>
+              {ailment.name} — NO PRESCRIPTION ISSUED — O. Reg. 256/24
+            </Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
             <Text style={styles.confidentialBadge}>CONFIDENTIAL</Text>
@@ -201,48 +211,56 @@ export function ReferralPdf({
 
         <View style={styles.columns}>
           <View style={styles.col}>
-            <Text style={styles.patientSectionLabel}>Patient</Text>
+            <Text style={styles.sectionLabel}>Patient</Text>
             <View style={styles.fieldRow}><Text style={styles.label}>Name</Text><Text style={styles.value}>{patient.name}</Text></View>
             <View style={styles.fieldRow}><Text style={styles.label}>DOB</Text><Text style={styles.value}>{patient.dob}</Text></View>
             {patient.ohip && <View style={styles.fieldRow}><Text style={styles.label}>OHIP</Text><Text style={styles.value}>{patient.ohip}</Text></View>}
+            {patient.address && <View style={styles.fieldRow}><Text style={styles.label}>Address</Text><Text style={styles.value}>{patient.address}, {patient.city} {patient.postalCode}</Text></View>}
             {patient.phone && <View style={styles.fieldRow}><Text style={styles.label}>Phone</Text><Text style={styles.value}>{patient.phone}</Text></View>}
-            {patient.encounterType && <View style={styles.fieldRow}><Text style={styles.label}>Encounter</Text><Text style={styles.value}>{patient.encounterType}</Text></View>}
+            <View style={styles.fieldRow}><Text style={styles.label}>Allergies</Text><Text style={styles.value}>{patient.allergies}</Text></View>
+            {patient.currentMeds && <View style={styles.fieldRow}><Text style={styles.label}>Meds</Text><Text style={styles.value}>{patient.currentMeds}</Text></View>}
           </View>
           <View style={styles.col}>
-            <Text style={styles.patientSectionLabel}>Family Physician</Text>
-            {patient.doctorName ? (
-              <>
-                <View style={styles.fieldRow}><Text style={styles.label}>Dr.</Text><Text style={styles.value}>{patient.doctorName}</Text></View>
-                {patient.doctorPhone && <View style={styles.fieldRow}><Text style={styles.label}>Phone</Text><Text style={styles.value}>{patient.doctorPhone}</Text></View>}
-                {patient.doctorFax && <View style={styles.fieldRow}><Text style={styles.label}>Fax</Text><Text style={styles.value}>{patient.doctorFax}</Text></View>}
-              </>
-            ) : (
-              <Text style={{ fontSize: 7, color: MUTED }}>No physician on file</Text>
-            )}
+            <Text style={styles.sectionLabel}>Assessment</Text>
+            <View style={styles.fieldRow}><Text style={styles.label}>Ailment</Text><Text style={styles.value}>{ailment.name}</Text></View>
+            <View style={styles.fieldRow}><Text style={styles.label}>Date</Text><Text style={styles.value}>{dateOfAssessment}</Text></View>
+            {patient.encounterType && <View style={styles.fieldRow}><Text style={styles.label}>Encounter</Text><Text style={styles.value}>{patient.encounterType}</Text></View>}
+            <View style={styles.fieldRow}><Text style={styles.label}>Outcome</Text><Text style={{ fontSize: 7.5, color: GREEN }}>No prescription issued</Text></View>
+            <View style={styles.fieldRow}><Text style={styles.label}>Red flags</Text><Text style={styles.value}>None identified</Text></View>
+            <View style={styles.fieldRow}><Text style={styles.label}>Follow-up</Text><Text style={styles.value}>{ailment.followUp}</Text></View>
           </View>
         </View>
 
-        {isNonRedFlag ? (
+        <Text style={styles.sectionLabel}>Reason No Prescription Issued</Text>
+        <View style={styles.reasonBlock}>
+          <Text style={styles.reasonLabel}>{reasonLabel}</Text>
+        </View>
+        {rationale && (
+          <View style={styles.notesBlock}>
+            <Text style={{ fontFamily: "Helvetica-Bold", fontSize: 6.5, marginBottom: 1, color: TEAL }}>CLINICAL RATIONALE</Text>
+            <Text style={{ fontSize: 7 }}>{rationale}</Text>
+          </View>
+        )}
+
+        {activeNonRx.length > 0 && (
           <>
-            <Text style={styles.sectionLabel}>Reason for Referral</Text>
-            <View style={styles.notesBlock}>
-              <Text style={{ fontSize: 7 }}>
-                {referralReason || "Pharmacist clinical judgment — physician review warranted (no red flags identified)."}
-              </Text>
-            </View>
-          </>
-        ) : (
-          <>
-            <Text style={styles.sectionLabel}>Red Flags Identified</Text>
-            <View style={styles.redBlock}>
-              {redFlagsChecked.map((flag) => (
-                <View key={flag} style={styles.redFlagItem}>
-                  <Text style={styles.redBullet}>⚠</Text>
-                  <Text style={styles.redBulletText}>{flag}</Text>
+            <Text style={styles.sectionLabel}>Non-Prescription Advice Provided</Text>
+            <View style={styles.greenBlock}>
+              {activeNonRx.map((item) => (
+                <View key={item} style={styles.checkItem}>
+                  <Text style={[styles.bullet, { color: GREEN }]}>✓</Text>
+                  <Text style={styles.bulletText}>{item}</Text>
                 </View>
               ))}
             </View>
           </>
+        )}
+
+        {assessmentNotes && (
+          <View style={styles.notesBlock}>
+            <Text style={{ fontFamily: "Helvetica-Bold", fontSize: 6.5, marginBottom: 1, color: TEAL }}>ASSESSMENT NOTES</Text>
+            <Text style={{ fontSize: 7 }}>{assessmentNotes}</Text>
+          </View>
         )}
 
         <View style={styles.signatureSection}>
@@ -251,16 +269,30 @@ export function ReferralPdf({
             <View style={styles.signatureLine} />
             <Text style={styles.signatureLabel}>{pharmacy?.pharmacistName || "__________"} — License #{pharmacy?.provincialLicense || "__________"}</Text>
           </View>
+          <View style={styles.signatureBox}>
+            <Text style={{ fontSize: 6.5, fontFamily: "Helvetica-Bold", color: TEAL, marginBottom: 2, textTransform: "uppercase", letterSpacing: 1 }}>
+              {consentSignerName ? "Patient / SDM Signature" : "Patient / SDM Signature"}
+            </Text>
+            <View style={styles.signatureLine} />
+            <Text style={styles.signatureLabel}>
+              {consentSignerName ? `${consentSignerName}${consentSignerRelationship ? ` (${consentSignerRelationship})` : ""}` : "__________"}
+            </Text>
+          </View>
         </View>
 
         <View style={styles.footerDivider} />
         <View style={styles.phipaBox}>
           <Text>
-            {isNonRedFlag
-              ? "CONFIDENTIAL — Privileged health information under PHIPA. Patient referred for physician review per O. Reg. 256/24."
-              : "CONFIDENTIAL — Privileged health information under PHIPA. Patient referred to primary care physician due to identified red flags per O. Reg. 256/24."}
+            CONFIDENTIAL — Privileged health information under PHIPA. Assessment completed; no prescription issued per O. Reg. 256/24. Reason recorded above.
           </Text>
         </View>
+        {consentCaptureMethod && (
+          <Text style={styles.footerText}>
+            Consent captured {consentCaptureMethod}
+            {consentCapturedAt ? ` on ${consentCapturedAt}` : ""}
+            {consentStatementVersion ? ` — statement version ${consentStatementVersion}` : ""}.
+          </Text>
+        )}
         <Text style={styles.footerText}>Ontario Minor Ailments CDST — O. Reg. 256/24 under the Pharmacy Act</Text>
       </Page>
     </Document>

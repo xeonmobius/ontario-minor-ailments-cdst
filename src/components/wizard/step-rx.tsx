@@ -1,12 +1,13 @@
 "use client"
 
-import { Ailment, SelectedRx } from "@/types"
+import { Ailment, NonPrescribeReason, SelectedRx } from "@/types"
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Checkbox } from "@/components/ui/checkbox"
+import { NonPrescribePanel } from "./non-prescribe-panel"
 
 interface StepRxProps {
   ailment: Ailment
@@ -15,9 +16,24 @@ interface StepRxProps {
   onSelectedRxChange: (rx: SelectedRx) => void
   nonRxChecked: string[]
   onNonRxChange: (items: string[]) => void
+  nonPrescribeReason?: NonPrescribeReason | null
+  onNonPrescribeReasonChange?: (r: NonPrescribeReason | null) => void
+  nonPrescribeRationale?: string
+  onNonPrescribeRationaleChange?: (s: string) => void
 }
 
-export function StepRx({ ailment, selectedRx, onSelect, onSelectedRxChange, nonRxChecked, onNonRxChange }: StepRxProps) {
+export function StepRx({
+  ailment,
+  selectedRx,
+  onSelect,
+  onSelectedRxChange,
+  nonRxChecked,
+  onNonRxChange,
+  nonPrescribeReason,
+  onNonPrescribeReasonChange,
+  nonPrescribeRationale,
+  onNonPrescribeRationaleChange,
+}: StepRxProps) {
   function handleFieldChange(field: keyof SelectedRx, value: string) {
     if (!selectedRx) return
     onSelectedRxChange({ ...selectedRx, [field]: value })
@@ -142,6 +158,22 @@ export function StepRx({ ailment, selectedRx, onSelect, onSelectedRxChange, nonR
         <h3 className="text-lg font-semibold mb-2">Follow-up</h3>
         <p className="text-sm text-muted-foreground">{ailment.followUp}</p>
       </div>
+
+      {onNonPrescribeReasonChange && onNonPrescribeRationaleChange && (
+        <>
+          <Separator />
+          <NonPrescribePanel
+            ailment={ailment}
+            value={nonPrescribeReason ?? null}
+            onReasonChange={onNonPrescribeReasonChange}
+            rationale={nonPrescribeRationale ?? ""}
+            onRationaleChange={onNonPrescribeRationaleChange}
+            nonRxChecked={nonRxChecked}
+            onNonRxChange={onNonRxChange}
+            showNonRxAdvice={false}
+          />
+        </>
+      )}
     </div>
   )
 }

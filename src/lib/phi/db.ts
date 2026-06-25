@@ -69,6 +69,16 @@ async function ensureSchema() {
       CREATE INDEX IF NOT EXISTS idx_assessments_pharmacy ON phi.assessments (pharmacy_id, created_at DESC);
       CREATE INDEX IF NOT EXISTS idx_assessments_patient   ON phi.assessments (patient_hash);
       CREATE INDEX IF NOT EXISTS idx_assessments_tx         ON phi.assessments (tx_id);
+
+      ALTER TABLE phi.assessments ADD COLUMN IF NOT EXISTS outcome TEXT;
+      ALTER TABLE phi.assessments ADD COLUMN IF NOT EXISTS non_prescribe_reason TEXT;
+      ALTER TABLE phi.assessments ADD COLUMN IF NOT EXISTS non_prescribe_rationale TEXT;
+      ALTER TABLE phi.assessments ADD COLUMN IF NOT EXISTS abandonment_reason TEXT;
+      ALTER TABLE phi.assessments ADD COLUMN IF NOT EXISTS reason_taxonomy_version TEXT;
+      ALTER TABLE phi.assessments ADD COLUMN IF NOT EXISTS reason_taxonomy_hash TEXT;
+      CREATE INDEX IF NOT EXISTS idx_assessments_non_prescribe
+        ON phi.assessments (pharmacy_id, non_prescribe_reason)
+        WHERE non_prescribe_reason IS NOT NULL;
     `)
     migrated = true
   } finally {

@@ -66,6 +66,24 @@ export interface AssessmentData {
   dateOfAssessment: string
 }
 
+export type AssessmentOutcome = "prescribed" | "referred" | "not_prescribed" | "abandoned"
+
+export type NonPrescribeReason =
+  | "patient_declined"
+  | "otc_sufficient"
+  | "clinical_judgment"
+  | "already_treating"
+  | "referred_to_physician"
+  | "referred_elsewhere"
+  | "other"
+
+export type AbandonmentReason =
+  | "patient_left"
+  | "patient_deferred"
+  | "lost_to_followup"
+  | "duplicate"
+  | "other"
+
 export type UserRole = "owner" | "pharmacist"
 export type PharmacyMemberRole = "owner" | "pharmacist"
 

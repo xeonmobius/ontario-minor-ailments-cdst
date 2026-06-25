@@ -26,6 +26,7 @@ describe("Wizard navigation logic", () => {
     allergies: "NKDA",
     currentMeds: "",
     doctorName: "", doctorLicense: "", doctorPhone: "", doctorFax: "", doctorAddress: "",
+    encounterType: "", pregnant: false, breastfeeding: false,
   }
 
   it("starts at step 0", () => {

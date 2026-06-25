@@ -15,6 +15,7 @@ const basePatient: PatientInfo = {
   allergies: "NKDA",
   currentMeds: "",
   doctorName: "", doctorLicense: "", doctorPhone: "", doctorFax: "", doctorAddress: "",
+  encounterType: "", pregnant: false, breastfeeding: false,
 }
 
 describe("StepPatient", () => {

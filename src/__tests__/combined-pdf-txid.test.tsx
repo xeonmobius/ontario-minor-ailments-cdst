@@ -22,6 +22,7 @@ const mockPatient: PatientInfo = {
   name: "John Doe", dob: "1990-01-01", sex: "M",
   ohip: "", address: "", city: "", postalCode: "",
   phone: "", allergies: "None", currentMeds: "", doctorName: "", doctorLicense: "", doctorPhone: "", doctorFax: "", doctorAddress: "",
+  encounterType: "", pregnant: false, breastfeeding: false,
 }
 
 const mockRx: SelectedRx = {
