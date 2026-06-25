@@ -1,12 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { Ailment, PatientInfo, PharmacyDefaults, SelectedRx } from "@/types"
+import { Ailment, ConsentCapture, PatientInfo, PharmacyDefaults, SelectedRx } from "@/types"
 import { downloadPdf } from "@/lib/pdf-helpers"
 import { CombinedPdf } from "@/components/combined-pdf"
 import { PatientInstructionsPdf } from "@/components/patient-instructions-pdf"
+import { ConsentPanel } from "@/components/consent/consent-panel"
 import { reserveTxId } from "@/lib/prescription-actions"
 import { saveAssessment } from "@/lib/phi/assessment-store"
+import { saveConsentAction } from "@/lib/consent-actions"
 import { getPatientInstructions, type Language } from "@/lib/i18n/patient-instructions"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -21,9 +23,11 @@ interface StepGenerateProps {
   symptomsChecked: string[]
   nonRxChecked: string[]
   pharmacy?: PharmacyDefaults | null
+  consent: ConsentCapture | null
+  onConsentChange: (c: ConsentCapture | null) => void
 }
 
-export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, symptomsChecked, nonRxChecked, pharmacy }: StepGenerateProps) {
+export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, symptomsChecked, nonRxChecked, pharmacy, consent, onConsentChange }: StepGenerateProps) {
   const dateOfAssessment = new Date().toLocaleDateString("en-CA")
   const [txId, setTxId] = useState<string | null>(null)
   const [handoutLanguage, setHandoutLanguage] = useState<Language | "both">("en")
@@ -35,6 +39,7 @@ export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, sy
   )
 
   async function handleDownload() {
+    if (!consent) return
     try {
       let resolvedTxId = txId
       if (!resolvedTxId) {
@@ -43,6 +48,14 @@ export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, sy
         resolvedTxId = result.txId ?? null
         setTxId(resolvedTxId)
       }
+      // Consent authorises the act of recording, so it is captured first
+      // (fail-closed: a persistence error here blocks the document). Phase 1
+      // no-op stub returns null; the signature is baked onto the PDF regardless.
+      const consentRes = await saveConsentAction({
+        consent,
+        patient: { name: patient.name, dob: patient.dob },
+        assessmentTxId: resolvedTxId ?? undefined,
+      })
       const doc = <CombinedPdf
         ailment={ailment}
         patient={patient}
@@ -53,6 +66,12 @@ export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, sy
         symptomsChecked={symptomsChecked}
         nonRxChecked={nonRxChecked}
         txId={resolvedTxId ?? undefined}
+        consentSignatureDataUrl={consent.signatureDataUrl}
+        consentSignerName={consent.signerName}
+        consentSignerRelationship={consent.signerRelationship}
+        consentCaptureMethod={consent.captureMethod}
+        consentStatementVersion={consent.statementVersion}
+        consentCapturedAt={consent.capturedAt}
       />
       await downloadPdf(doc, `prescription-${dateOfAssessment}-${resolvedTxId ?? "draft"}.pdf`)
       if (resolvedTxId) {
@@ -68,6 +87,7 @@ export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, sy
           selectedRx,
           nonRxChecked,
           isReferral: false,
+          consentId: consentRes.consentId ?? undefined,
         })
       }
     } catch (err) {
@@ -120,12 +140,22 @@ export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, sy
 
       <Separator />
 
+      <ConsentPanel
+        ailmentName={ailment.name}
+        pharmacyName={pharmacy?.pharmacyName ?? ""}
+        encounterType={patient.encounterType}
+        value={consent}
+        onChange={onConsentChange}
+      />
+
       <div className="flex flex-col gap-3">
-        <Button onClick={handleDownload}>
+        <Button onClick={handleDownload} disabled={!consent}>
           Download Prescription + Doctor Notification PDF
         </Button>
         <p className="text-xs text-muted-foreground">
-          Combined single-page document with full clinical documentation, prescription, physician notification, and signature lines. Print, sign, and fax to the physician.
+          {consent
+            ? "Combined single-page document with full clinical documentation, prescription, physician notification, and signature lines. Print, sign, and fax to the physician."
+            : "Capture patient consent above before producing the document."}
         </p>
       </div>
 

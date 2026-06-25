@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import {
   AbandonmentReason,
   Ailment,
+  ConsentCapture,
   NonPrescribeReason,
   PatientInfo,
   PharmacyDefaults,
@@ -19,9 +20,11 @@ import { StepGenerate } from "./step-generate"
 import { ReferralPdf } from "./referral-pdf"
 import { NonPrescribePdf } from "./non-prescribe-pdf"
 import { AbandonDialog } from "./abandon-dialog"
+import { ConsentPanel } from "@/components/consent/consent-panel"
 import { downloadPdf } from "@/lib/pdf-helpers"
 import { reserveTxId } from "@/lib/prescription-actions"
 import { saveAssessment } from "@/lib/phi/assessment-store"
+import { saveConsentAction } from "@/lib/consent-actions"
 import { getRecalledSigAction } from "@/lib/sig-recall-actions"
 import { getSigDefault } from "@/lib/clinical/sig-defaults"
 import {
@@ -67,6 +70,7 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
   const [nonPrescribeRationale, setNonPrescribeRationale] = useState("")
   const [abandonOpen, setAbandonOpen] = useState(false)
   const [recalled, setRecalled] = useState<RecalledSig | null>(null)
+  const [consent, setConsent] = useState<ConsentCapture | null>(null)
 
   const hasRedFlags = redFlagsChecked.length > 0
   const isNonPrescribe = nonPrescribeReason !== null
@@ -161,15 +165,31 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
   }, [step, selectedRx?.drug, patient.name, patient.dob, ailment.id])
 
   async function handleDownloadReferral() {
+    if (!consent) return
     const dateOfAssessment = new Date().toLocaleDateString("en-CA")
     const result = await reserveTxId()
     const txId = result.txId ?? null
+    // Consent authorises recording (incl. disclosure to the physician), so it is
+    // captured before the referral document is produced (fail-closed).
+    const consentRes = txId
+      ? await saveConsentAction({
+          consent,
+          patient: { name: patient.name, dob: patient.dob },
+          assessmentTxId: txId,
+        })
+      : { consentId: null }
     const doc = <ReferralPdf
       ailment={ailment}
       patient={patient}
       redFlagsChecked={redFlagsChecked}
       dateOfAssessment={dateOfAssessment}
       pharmacy={pharmacy}
+      consentSignatureDataUrl={consent.signatureDataUrl}
+      consentSignerName={consent.signerName}
+      consentSignerRelationship={consent.signerRelationship}
+      consentCaptureMethod={consent.captureMethod}
+      consentStatementVersion={consent.statementVersion}
+      consentCapturedAt={consent.capturedAt}
     />
     await downloadPdf(doc, `referral-${dateOfAssessment}${txId ? `-${txId}` : ""}.pdf`)
     if (txId) {
@@ -186,6 +206,7 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
         nonRxChecked,
         isReferral: true,
         outcome: "referred",
+        consentId: consentRes.consentId ?? undefined,
       })
     }
   }
@@ -351,7 +372,14 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
                   </ul>
                 </div>
               </div>
-              <Button variant="destructive" onClick={handleDownloadReferral}>
+              <ConsentPanel
+                ailmentName={ailment.name}
+                pharmacyName={pharmacy?.pharmacyName ?? ""}
+                encounterType={patient.encounterType}
+                value={consent}
+                onChange={setConsent}
+              />
+              <Button variant="destructive" onClick={handleDownloadReferral} disabled={!consent}>
                 Download Referral PDF
               </Button>
               <p className="text-xs text-muted-foreground">Print, sign, and fax this referral to the patient&apos;s family physician.</p>
@@ -409,6 +437,8 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
               symptomsChecked={symptomsChecked}
               nonRxChecked={nonRxChecked}
               pharmacy={pharmacy}
+              consent={consent}
+              onConsentChange={setConsent}
             />
           )}
         </div>

@@ -111,6 +111,25 @@ export interface PatientIdentity {
   dob: string
 }
 
+// Digital consent capture (roadmap #3). The patient/SDM authorisation captured
+// at the counter immediately before the document is produced. The captured
+// stroke signature (signatureDataUrl) is PHI baked onto the PDF client-side and,
+// when fly.io is live, persisted via saveConsentAction — never to Supabase.
+export type SignerRelationship = "self" | "parent" | "guardian" | "sdm"
+export type CaptureMethod = "signature" | "verbal_attested"
+
+export interface ConsentCapture {
+  consentToAssess: boolean
+  consentToRecord: boolean
+  consentToFollowup: boolean
+  statementVersion: string
+  signerName: string
+  signerRelationship: SignerRelationship
+  signatureDataUrl: string | null
+  captureMethod: CaptureMethod
+  capturedAt: string
+}
+
 export interface RecalledSig {
   drug: string
   sig: string

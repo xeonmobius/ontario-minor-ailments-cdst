@@ -75,9 +75,37 @@ async function ensureSchema() {
       ALTER TABLE phi.assessments ADD COLUMN IF NOT EXISTS abandonment_reason TEXT;
       ALTER TABLE phi.assessments ADD COLUMN IF NOT EXISTS reason_taxonomy_version TEXT;
       ALTER TABLE phi.assessments ADD COLUMN IF NOT EXISTS reason_taxonomy_hash TEXT;
+      ALTER TABLE phi.assessments ADD COLUMN IF NOT EXISTS consent_id TEXT;
       CREATE INDEX IF NOT EXISTS idx_assessments_non_prescribe
         ON phi.assessments (pharmacy_id, non_prescribe_reason)
         WHERE non_prescribe_reason IS NOT NULL;
+
+      -- Roadmap #3: patient/SDM consent artefact. PHI (signer identity + the
+      -- stroke image) lives here on fly.io only; never Supabase. Scoped by
+      -- pharmacy_id on every read/write. assessment_tx_id back-links the
+      -- assessment; assessments.consent_id forward-links the consent.
+      CREATE TABLE IF NOT EXISTS phi.consents (
+        id                  TEXT PRIMARY KEY,
+        patient_hash        TEXT NOT NULL,
+        pharmacy_id         TEXT NOT NULL,
+        pharmacist_id       TEXT NOT NULL,
+        assessment_tx_id    TEXT,
+        statement_version   TEXT NOT NULL,
+        statement_hash      TEXT NOT NULL,
+        consent_to_assess   BOOLEAN NOT NULL,
+        consent_to_record   BOOLEAN NOT NULL,
+        consent_to_followup BOOLEAN NOT NULL DEFAULT FALSE,
+        signer_name         TEXT NOT NULL,
+        signer_relationship TEXT NOT NULL,
+        capture_method      TEXT NOT NULL,
+        signature_png       BYTEA,
+        ip_address          TEXT,
+        captured_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+      CREATE INDEX IF NOT EXISTS idx_consents_pharmacy ON phi.consents (pharmacy_id, captured_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_consents_patient   ON phi.consents (patient_hash);
+      CREATE INDEX IF NOT EXISTS idx_consents_tx        ON phi.consents (assessment_tx_id);
     `)
     migrated = true
   } finally {

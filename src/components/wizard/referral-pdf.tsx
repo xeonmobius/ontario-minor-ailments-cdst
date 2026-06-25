@@ -5,9 +5,10 @@ import {
   Page,
   Text,
   View,
+  Image,
   StyleSheet,
 } from "@react-pdf/renderer"
-import { Ailment, PatientInfo, PharmacyDefaults } from "@/types"
+import { Ailment, PatientInfo, PharmacyDefaults, SignerRelationship, CaptureMethod } from "@/types"
 import { ReferencesSection } from "./pdf-references"
 
 const TEAL = "#1a6b6b"
@@ -126,6 +127,8 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   signatureBox: { flex: 1, marginRight: 12 },
+  patientSignatureBox: { flex: 1 },
+  patientSignatureImage: { width: 130, height: 32, objectFit: "contain" },
   signatureLine: {
     borderBottomWidth: 1,
     borderBottomColor: DARK,
@@ -133,6 +136,7 @@ const styles = StyleSheet.create({
     height: 20,
   },
   signatureLabel: { fontSize: 6, color: MUTED, fontFamily: "Helvetica-Bold" },
+  consentAttestation: { fontSize: 5.5, color: MUTED, marginTop: 2 },
   footerDivider: {
     borderBottomWidth: 0.5,
     borderBottomColor: BORDER,
@@ -158,6 +162,12 @@ interface ReferralPdfProps {
   pharmacy: PharmacyDefaults | null
   referralContext?: "red_flag" | "non_red_flag"
   referralReason?: string
+  consentSignatureDataUrl?: string | null
+  consentSignerName?: string
+  consentSignerRelationship?: SignerRelationship
+  consentCaptureMethod?: CaptureMethod
+  consentStatementVersion?: string
+  consentCapturedAt?: string
 }
 
 export function ReferralPdf({
@@ -168,6 +178,12 @@ export function ReferralPdf({
   pharmacy,
   referralContext = "red_flag",
   referralReason,
+  consentSignatureDataUrl,
+  consentSignerName,
+  consentSignerRelationship,
+  consentCaptureMethod,
+  consentStatementVersion,
+  consentCapturedAt,
 }: ReferralPdfProps) {
   const isNonRedFlag = referralContext === "non_red_flag"
   return (
@@ -251,6 +267,19 @@ export function ReferralPdf({
             <View style={styles.signatureLine} />
             <Text style={styles.signatureLabel}>{pharmacy?.pharmacistName || "__________"} — License #{pharmacy?.provincialLicense || "__________"}</Text>
           </View>
+          <View style={styles.patientSignatureBox}>
+            <Text style={{ fontSize: 6.5, fontFamily: "Helvetica-Bold", color: TEAL, marginBottom: 2, textTransform: "uppercase", letterSpacing: 1 }}>
+              Patient / SDM Signature{consentSignerRelationship && consentSignerRelationship !== "self" ? ` (${consentSignerRelationship})` : ""}
+            </Text>
+            {consentSignatureDataUrl ? (
+              // react-pdf Image is a PDF primitive (not a DOM img) and has no alt prop.
+              // eslint-disable-next-line jsx-a11y/alt-text
+              <Image src={consentSignatureDataUrl} style={styles.patientSignatureImage} />
+            ) : (
+              <View style={styles.signatureLine} />
+            )}
+            <Text style={styles.signatureLabel}>{consentSignerName || "__________"}</Text>
+          </View>
         </View>
 
         <ReferencesSection slug={ailment.slug} />
@@ -262,6 +291,15 @@ export function ReferralPdf({
               ? "CONFIDENTIAL — Privileged health information under PHIPA. Patient referred for physician review per O. Reg. 256/24. Allergy, drug-interaction, and pregnancy/lactation screening are performed in the pharmacy management system and are not duplicated by this assessment."
               : "CONFIDENTIAL — Privileged health information under PHIPA. Patient referred to primary care physician due to identified red flags per O. Reg. 256/24. Allergy, drug-interaction, and pregnancy/lactation screening are performed in the pharmacy management system and are not duplicated by this assessment."}
           </Text>
+          {consentCaptureMethod && (
+            <Text style={styles.consentAttestation}>
+              Patient/SDM consent captured {consentCaptureMethod === "verbal_attested" ? "verbally" : "in-person"}
+              {consentCapturedAt ? ` on ${consentCapturedAt.slice(0, 10)}` : ""}
+              {consentStatementVersion ? ` — statement version ${consentStatementVersion}` : ""}.
+              {consentSignerName ? ` Signer: ${consentSignerName}` : ""}
+              {consentSignerRelationship ? ` (${consentSignerRelationship})` : ""}.
+            </Text>
+          )}
         </View>
         <Text style={styles.footerText}>Ontario Minor Ailments CDST — O. Reg. 256/24 under the Pharmacy Act</Text>
       </Page>

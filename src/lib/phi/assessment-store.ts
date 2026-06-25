@@ -30,6 +30,7 @@ export interface SaveAssessmentInput {
   abandonmentReason?: AbandonmentReason
   reasonTaxonomyVersion?: string
   reasonTaxonomyHash?: string
+  consentId?: string
 }
 
 const VALID_NON_PRESCRIBE_REASONS: NonPrescribeReason[] = [
@@ -76,6 +77,7 @@ export async function saveAssessment(input: SaveAssessmentInput): Promise<{ id?:
         pharmacist_id, pharmacy_id,
         outcome, non_prescribe_reason, non_prescribe_rationale,
         abandonment_reason, reason_taxonomy_version, reason_taxonomy_hash,
+        consent_id,
         created_at
       ) VALUES (
         $1, $2, $3, $4, $5,
@@ -85,6 +87,7 @@ export async function saveAssessment(input: SaveAssessmentInput): Promise<{ id?:
         $16, $17,
         $18, $19, $20,
         $21, $22, $23,
+        $24,
         NOW()
       )`,
       [
@@ -111,6 +114,7 @@ export async function saveAssessment(input: SaveAssessmentInput): Promise<{ id?:
         input.abandonmentReason ?? null,
         input.reasonTaxonomyVersion ?? null,
         input.reasonTaxonomyHash ?? null,
+        input.consentId ?? null,
       ],
     )
     return { id }
