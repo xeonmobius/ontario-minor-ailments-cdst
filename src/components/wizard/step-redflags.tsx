@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { DifferentialPanel } from "./differential-panel"
+import { CitationPanel } from "./citation-panel"
 
 interface StepRedFlagsProps {
   ailment: Ailment
@@ -81,6 +82,7 @@ export function StepRedFlags({
             )
           })}
         </div>
+        <CitationPanel slug={ailment.slug} step="redFlagScreening" />
       </div>
 
       {hasRedFlag && (

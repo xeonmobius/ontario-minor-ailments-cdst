@@ -35,6 +35,35 @@ export interface DifferentialEntry {
   clinicalPearls?: string[]
 }
 
+export type CitationType =
+  | "guideline"
+  | "study"
+  | "systematic-review"
+  | "regulatory"
+  | "monograph"
+
+export type ProtocolStep =
+  | "redFlagScreening"
+  | "rxSelection"
+  | "nonRxAdvice"
+  | "followUp"
+
+export interface Citation {
+  id: string
+  source: string
+  type: CitationType
+  year?: number
+  url?: string
+  doi?: string
+  summary?: string
+}
+
+export interface AilmentCitations {
+  regulatory: Citation[]
+  primary: Citation[]
+  byStep?: Partial<Record<ProtocolStep, Citation[]>>
+}
+
 export interface PatientInfo {
   name: string
   dob: string
