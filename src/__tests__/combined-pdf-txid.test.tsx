@@ -1,13 +1,14 @@
 import { describe, it, expect, vi } from "vitest"
 import { render } from "@testing-library/react"
+import type { ReactNode } from "react"
 import type { Ailment, PatientInfo, SelectedRx } from "@/types"
 
 vi.mock("@react-pdf/renderer", () => ({
-  Document: ({ children }: any) => <div data-testid="doc">{children}</div>,
-  Page: ({ children }: any) => <div>{children}</div>,
-  Text: ({ children }: any) => <span>{children}</span>,
-  View: ({ children, style }: any) => <div>{children}</div>,
-  StyleSheet: { create: (s: any) => s },
+  Document: ({ children }: { children: ReactNode }) => <div data-testid="doc">{children}</div>,
+  Page: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  Text: ({ children }: { children: ReactNode }) => <span>{children}</span>,
+  View: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  StyleSheet: { create: <T,>(s: T): T => s },
 }))
 
 import { CombinedPdf } from "@/components/combined-pdf"
@@ -20,9 +21,9 @@ const mockAilment: Ailment = {
 
 const mockPatient: PatientInfo = {
   name: "John Doe", dob: "1990-01-01", sex: "M",
-  ohip: "", address: "", city: "", postalCode: "",
-  phone: "", allergies: "None", currentMeds: "", doctorName: "", doctorLicense: "", doctorPhone: "", doctorFax: "", doctorAddress: "",
-  encounterType: "", pregnant: false, breastfeeding: false,
+  address: "", city: "", postalCode: "",
+  phone: "", doctorName: "", doctorPhone: "", doctorFax: "", doctorAddress: "",
+  encounterType: "",
 }
 
 const mockRx: SelectedRx = {

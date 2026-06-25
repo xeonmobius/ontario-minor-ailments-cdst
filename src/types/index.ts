@@ -68,21 +68,15 @@ export interface PatientInfo {
   name: string
   dob: string
   sex: string
-  ohip: string
   address: string
   city: string
   postalCode: string
   phone: string
-  allergies: string
-  currentMeds: string
   doctorName: string
-  doctorLicense: string
   doctorPhone: string
   doctorFax: string
   doctorAddress: string
   encounterType: string
-  pregnant: boolean
-  breastfeeding: boolean
 }
 
 export interface PharmacyDefaults {

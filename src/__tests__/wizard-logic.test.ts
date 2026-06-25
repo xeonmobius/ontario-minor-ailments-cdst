@@ -18,15 +18,12 @@ describe("Wizard navigation logic", () => {
     name: "",
     dob: "",
     sex: "",
-    ohip: "",
     address: "",
     city: "",
     postalCode: "",
     phone: "",
-    allergies: "NKDA",
-    currentMeds: "",
-    doctorName: "", doctorLicense: "", doctorPhone: "", doctorFax: "", doctorAddress: "",
-    encounterType: "", pregnant: false, breastfeeding: false,
+    doctorName: "", doctorPhone: "", doctorFax: "", doctorAddress: "",
+    encounterType: "",
   }
 
   it("starts at step 0", () => {

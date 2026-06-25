@@ -7,39 +7,42 @@ const basePatient: PatientInfo = {
   name: "",
   dob: "",
   sex: "",
-  ohip: "",
   address: "",
   city: "",
   postalCode: "",
   phone: "",
-  allergies: "NKDA",
-  currentMeds: "",
-  doctorName: "", doctorLicense: "", doctorPhone: "", doctorFax: "", doctorAddress: "",
-  encounterType: "", pregnant: false, breastfeeding: false,
+  doctorName: "",
+  doctorPhone: "",
+  doctorFax: "",
+  doctorAddress: "",
+  encounterType: "",
 }
 
 describe("StepPatient", () => {
   afterEach(cleanup)
 
-  it("renders all form fields", () => {
+  it("renders all retained form fields", () => {
     const onChange = vi.fn()
     render(<StepPatient patient={basePatient} onChange={onChange} />)
 
     expect(screen.getByLabelText(/patient name/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/date of birth/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/ohip/i)).toBeInTheDocument()
     expect(screen.getAllByLabelText(/^phone$/i).length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByLabelText(/^address$/i).length).toBeGreaterThanOrEqual(1)
     expect(screen.getByLabelText(/city/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/postal code/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/allergies/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/current medications/i)).toBeInTheDocument()
   })
 
-  it("shows NKDA as default allergies", () => {
+  it("does not render PMS-owned fields (allergies, meds, OHIP, license, pregnancy)", () => {
     const onChange = vi.fn()
     render(<StepPatient patient={basePatient} onChange={onChange} />)
-    expect(screen.getByLabelText(/allergies/i)).toHaveValue("NKDA")
+
+    expect(screen.queryByLabelText(/ohip/i)).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(/allergies/i)).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(/current medications/i)).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(/license/i)).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(/pregnant/i)).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(/breastfeeding/i)).not.toBeInTheDocument()
   })
 
   it("calls onChange when name is typed", () => {

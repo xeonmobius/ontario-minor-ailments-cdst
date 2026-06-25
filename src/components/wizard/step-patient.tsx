@@ -3,7 +3,6 @@
 import { PatientInfo } from "@/types"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Separator } from "@/components/ui/separator"
 
@@ -14,12 +13,7 @@ interface StepPatientProps {
 
 export function StepPatient({ patient, onChange }: StepPatientProps) {
   function handleChange(field: keyof PatientInfo, value: string) {
-    const update: Partial<PatientInfo> = { [field]: value }
-    if (field === "sex" && value !== "Female") {
-      update.pregnant = false
-      update.breastfeeding = false
-    }
-    onChange({ ...patient, ...update })
+    onChange({ ...patient, [field]: value })
   }
 
   return (
@@ -62,26 +56,6 @@ export function StepPatient({ patient, onChange }: StepPatientProps) {
               )
             })}
           </div>
-          {patient.sex === "Female" && (
-            <div className="flex gap-6 pt-3">
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="pregnant"
-                  checked={!!patient.pregnant}
-                  onCheckedChange={(checked) => onChange({ ...patient, pregnant: checked === true })}
-                />
-                <Label htmlFor="pregnant" className="text-sm cursor-pointer">Pregnant</Label>
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="breastfeeding"
-                  checked={!!patient.breastfeeding}
-                  onCheckedChange={(checked) => onChange({ ...patient, breastfeeding: checked === true })}
-                />
-                <Label htmlFor="breastfeeding" className="text-sm cursor-pointer">Breastfeeding</Label>
-              </div>
-            </div>
-          )}
         </div>
         <div className="flex flex-col gap-2">
           <Label>Encounter Type *</Label>
@@ -100,14 +74,6 @@ export function StepPatient({ patient, onChange }: StepPatientProps) {
               )
             })}
           </div>
-        </div>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="ohip">OHIP Number</Label>
-          <Input
-            id="ohip"
-            value={patient.ohip}
-            onChange={(e) => handleChange("ohip", e.target.value)}
-          />
         </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor="phone">Phone</Label>
@@ -141,23 +107,6 @@ export function StepPatient({ patient, onChange }: StepPatientProps) {
             onChange={(e) => handleChange("postalCode", e.target.value)}
           />
         </div>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="allergies">Allergies</Label>
-          <Input
-            id="allergies"
-            value={patient.allergies}
-            onChange={(e) => handleChange("allergies", e.target.value)}
-          />
-        </div>
-        <div className="flex flex-col gap-2 md:col-span-2">
-          <Label htmlFor="currentMeds">Current Medications</Label>
-          <Textarea
-            id="currentMeds"
-            value={patient.currentMeds}
-            onChange={(e) => handleChange("currentMeds", e.target.value)}
-            aria-label="Current medications"
-          />
-        </div>
       </div>
 
       <Separator />
@@ -170,14 +119,6 @@ export function StepPatient({ patient, onChange }: StepPatientProps) {
             id="doctorName"
             value={patient.doctorName}
             onChange={(e) => handleChange("doctorName", e.target.value)}
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="doctorLicense">License #</Label>
-          <Input
-            id="doctorLicense"
-            value={patient.doctorLicense}
-            onChange={(e) => handleChange("doctorLicense", e.target.value)}
           />
         </div>
         <div className="flex flex-col gap-2">

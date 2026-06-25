@@ -214,11 +214,8 @@ export function NonPrescribePdf({
             <Text style={styles.sectionLabel}>Patient</Text>
             <View style={styles.fieldRow}><Text style={styles.label}>Name</Text><Text style={styles.value}>{patient.name}</Text></View>
             <View style={styles.fieldRow}><Text style={styles.label}>DOB</Text><Text style={styles.value}>{patient.dob}</Text></View>
-            {patient.ohip && <View style={styles.fieldRow}><Text style={styles.label}>OHIP</Text><Text style={styles.value}>{patient.ohip}</Text></View>}
             {patient.address && <View style={styles.fieldRow}><Text style={styles.label}>Address</Text><Text style={styles.value}>{patient.address}, {patient.city} {patient.postalCode}</Text></View>}
             {patient.phone && <View style={styles.fieldRow}><Text style={styles.label}>Phone</Text><Text style={styles.value}>{patient.phone}</Text></View>}
-            <View style={styles.fieldRow}><Text style={styles.label}>Allergies</Text><Text style={styles.value}>{patient.allergies}</Text></View>
-            {patient.currentMeds && <View style={styles.fieldRow}><Text style={styles.label}>Meds</Text><Text style={styles.value}>{patient.currentMeds}</Text></View>}
           </View>
           <View style={styles.col}>
             <Text style={styles.sectionLabel}>Assessment</Text>
@@ -283,7 +280,7 @@ export function NonPrescribePdf({
         <View style={styles.footerDivider} />
         <View style={styles.phipaBox}>
           <Text>
-            CONFIDENTIAL — Privileged health information under PHIPA. Assessment completed; no prescription issued per O. Reg. 256/24. Reason recorded above.
+            CONFIDENTIAL — Privileged health information under PHIPA. Assessment completed; no prescription issued per O. Reg. 256/24. Reason recorded above. Allergy, drug-interaction, and pregnancy/lactation screening are performed in the pharmacy management system and are not duplicated by this assessment.
           </Text>
         </View>
         {consentCaptureMethod && (

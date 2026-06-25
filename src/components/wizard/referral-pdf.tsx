@@ -205,7 +205,6 @@ export function ReferralPdf({
             <Text style={styles.patientSectionLabel}>Patient</Text>
             <View style={styles.fieldRow}><Text style={styles.label}>Name</Text><Text style={styles.value}>{patient.name}</Text></View>
             <View style={styles.fieldRow}><Text style={styles.label}>DOB</Text><Text style={styles.value}>{patient.dob}</Text></View>
-            {patient.ohip && <View style={styles.fieldRow}><Text style={styles.label}>OHIP</Text><Text style={styles.value}>{patient.ohip}</Text></View>}
             {patient.phone && <View style={styles.fieldRow}><Text style={styles.label}>Phone</Text><Text style={styles.value}>{patient.phone}</Text></View>}
             {patient.encounterType && <View style={styles.fieldRow}><Text style={styles.label}>Encounter</Text><Text style={styles.value}>{patient.encounterType}</Text></View>}
           </View>
@@ -260,8 +259,8 @@ export function ReferralPdf({
         <View style={styles.phipaBox}>
           <Text>
             {isNonRedFlag
-              ? "CONFIDENTIAL — Privileged health information under PHIPA. Patient referred for physician review per O. Reg. 256/24."
-              : "CONFIDENTIAL — Privileged health information under PHIPA. Patient referred to primary care physician due to identified red flags per O. Reg. 256/24."}
+              ? "CONFIDENTIAL — Privileged health information under PHIPA. Patient referred for physician review per O. Reg. 256/24. Allergy, drug-interaction, and pregnancy/lactation screening are performed in the pharmacy management system and are not duplicated by this assessment."
+              : "CONFIDENTIAL — Privileged health information under PHIPA. Patient referred to primary care physician due to identified red flags per O. Reg. 256/24. Allergy, drug-interaction, and pregnancy/lactation screening are performed in the pharmacy management system and are not duplicated by this assessment."}
           </Text>
         </View>
         <Text style={styles.footerText}>Ontario Minor Ailments CDST — O. Reg. 256/24 under the Pharmacy Act</Text>

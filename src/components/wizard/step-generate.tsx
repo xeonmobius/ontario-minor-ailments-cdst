@@ -54,7 +54,6 @@ export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, sy
         nonRxChecked={nonRxChecked}
         txId={resolvedTxId ?? undefined}
       />
-      console.log("PDF patient data:", JSON.stringify({ doctorName: patient.doctorName, doctorLicense: patient.doctorLicense, doctorPhone: patient.doctorPhone, doctorFax: patient.doctorFax, doctorAddress: patient.doctorAddress }))
       await downloadPdf(doc, `prescription-${dateOfAssessment}-${resolvedTxId ?? "draft"}.pdf`)
       if (resolvedTxId) {
         await saveAssessment({

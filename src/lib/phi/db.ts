@@ -51,7 +51,6 @@ async function ensureSchema() {
         patient_name        TEXT NOT NULL,
         patient_dob         TEXT NOT NULL,
         patient_sex         TEXT,
-        patient_ohip        TEXT,
         ailment_id          TEXT NOT NULL,
         ailment_name        TEXT NOT NULL,
         tx_id               TEXT NOT NULL,

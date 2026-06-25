@@ -69,7 +69,7 @@ export async function saveAssessment(input: SaveAssessmentInput): Promise<{ id?:
   try {
     await query(
       `INSERT INTO phi.assessments (
-        id, patient_hash, patient_name, patient_dob, patient_sex, patient_ohip,
+        id, patient_hash, patient_name, patient_dob, patient_sex,
         ailment_id, ailment_name, tx_id,
         red_flags_checked, has_red_flag, symptoms_checked, assessment_notes,
         selected_rx, non_rx_checked, is_referral,
@@ -78,13 +78,13 @@ export async function saveAssessment(input: SaveAssessmentInput): Promise<{ id?:
         abandonment_reason, reason_taxonomy_version, reason_taxonomy_hash,
         created_at
       ) VALUES (
-        $1, $2, $3, $4, $5, $6,
-        $7, $8, $9,
-        $10, $11, $12, $13,
-        $14, $15, $16,
-        $17, $18,
-        $19, $20, $21,
-        $22, $23, $24,
+        $1, $2, $3, $4, $5,
+        $6, $7, $8,
+        $9, $10, $11, $12,
+        $13, $14, $15,
+        $16, $17,
+        $18, $19, $20,
+        $21, $22, $23,
         NOW()
       )`,
       [
@@ -93,7 +93,6 @@ export async function saveAssessment(input: SaveAssessmentInput): Promise<{ id?:
         input.patient.name,
         input.patient.dob,
         input.patient.sex,
-        input.patient.ohip,
         input.ailmentId,
         input.ailmentName,
         input.txId,

@@ -220,13 +220,8 @@ export function CombinedPdf({
             <Text style={styles.sectionLabel}>Patient</Text>
             <View style={styles.fieldRow}><Text style={styles.label}>Name</Text><Text style={styles.value}>{patient.name}</Text></View>
             <View style={styles.fieldRow}><Text style={styles.label}>DOB</Text><Text style={styles.value}>{patient.dob}</Text></View>
-            {patient.ohip && <View style={styles.fieldRow}><Text style={styles.label}>OHIP</Text><Text style={styles.value}>{patient.ohip}</Text></View>}
             {patient.address && <View style={styles.fieldRow}><Text style={styles.label}>Address</Text><Text style={styles.value}>{patient.address}, {patient.city} {patient.postalCode}</Text></View>}
             {patient.phone && <View style={styles.fieldRow}><Text style={styles.label}>Phone</Text><Text style={styles.value}>{patient.phone}</Text></View>}
-            <View style={styles.fieldRow}><Text style={styles.label}>Allergies</Text><Text style={styles.value}>{patient.allergies}</Text></View>
-            {patient.currentMeds && <View style={styles.fieldRow}><Text style={styles.label}>Meds</Text><Text style={styles.value}>{patient.currentMeds}</Text></View>}
-            {patient.pregnant && <View style={styles.fieldRow}><Text style={styles.label}>Status</Text><Text style={{ fontSize: 7.5, color: "#b91c1c" }}>Pregnant</Text></View>}
-            {patient.breastfeeding && <View style={styles.fieldRow}><Text style={styles.label}>Status</Text><Text style={{ fontSize: 7.5, color: "#b91c1c" }}>Breastfeeding</Text></View>}
           </View>
           <View style={styles.col}>
             <Text style={styles.sectionLabel}>Assessment</Text>
@@ -244,7 +239,6 @@ export function CombinedPdf({
             <View style={styles.col}>
               <Text style={styles.sectionLabel}>Family Physician (Faxed to)</Text>
               <View style={styles.fieldRow}><Text style={styles.label}>Dr.</Text><Text style={styles.value}>{patient.doctorName}</Text></View>
-              {patient.doctorLicense && <View style={styles.fieldRow}><Text style={styles.label}>License</Text><Text style={styles.value}>{patient.doctorLicense}</Text></View>}
               {patient.doctorPhone && <View style={styles.fieldRow}><Text style={styles.label}>Phone</Text><Text style={styles.value}>{patient.doctorPhone}</Text></View>}
               {patient.doctorFax && <View style={styles.fieldRow}><Text style={styles.label}>Fax</Text><Text style={styles.value}>{patient.doctorFax}</Text></View>}
               {patient.doctorAddress && <View style={styles.fieldRow}><Text style={styles.label}>Address</Text><Text style={styles.value}>{patient.doctorAddress}</Text></View>}
@@ -319,7 +313,7 @@ export function CombinedPdf({
 
         <View style={styles.footerDivider} />
         <View style={styles.phipaBox}>
-          <Text>CONFIDENTIAL — Privileged health information under PHIPA. Red flags screened and ruled out prior to prescribing per O. Reg. 256/24.</Text>
+          <Text>CONFIDENTIAL — Privileged health information under PHIPA. Red flags screened and ruled out prior to prescribing per O. Reg. 256/24. Allergy, drug-interaction, and pregnancy/lactation screening are performed in the pharmacy management system and are not duplicated by this assessment.</Text>
         </View>
         <Text style={styles.footerText}>Ontario Minor Ailments CDST — O. Reg. 256/24 under the Pharmacy Act</Text>
       </Page>

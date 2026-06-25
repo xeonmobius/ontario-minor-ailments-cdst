@@ -36,21 +36,15 @@ const defaultPatient: PatientInfo = {
   name: "",
   dob: "",
   sex: "",
-  ohip: "",
   address: "",
   city: "",
   postalCode: "",
   phone: "",
-  allergies: "NKDA",
-  currentMeds: "",
   doctorName: "",
-  doctorLicense: "",
   doctorPhone: "",
   doctorFax: "",
   doctorAddress: "",
   encounterType: "",
-  pregnant: false,
-  breastfeeding: false,
 }
 
 interface WizardContainerProps {
