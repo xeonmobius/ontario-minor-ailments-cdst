@@ -18,6 +18,7 @@ export interface SaveConsentInput {
   patientName: string
   patientDob: string
   assessmentTxId?: string
+  vaccinationId?: string
   statementVersion: string
   statementHash: string
   consentToAssess: boolean
@@ -28,6 +29,10 @@ export interface SaveConsentInput {
   captureMethod: CaptureMethod
   signaturePng: Buffer | null
   ipAddress: string | null
+  // Vaccination variant (roadmap #22). Defaults to minor_ailments for existing
+  // callers; consentToVaccinate is set only when consentType='vaccination'.
+  consentType?: "minor_ailments" | "vaccination"
+  consentToVaccinate?: boolean
 }
 
 // Phase-1 (PHI_PERSIST_ENABLED off) returns null without a DB call — the
@@ -37,7 +42,9 @@ export async function saveConsent(input: SaveConsentInput): Promise<{ consentId:
   if (!isPhiEnabled()) return { consentId: null }
 
   // Defence-in-depth: never trust client booleans for a legal artefact.
-  if (!input.consentToAssess || !input.consentToRecord) {
+  const isVaccination = input.consentType === "vaccination"
+  const primaryConsent = isVaccination ? input.consentToVaccinate : input.consentToAssess
+  if (!primaryConsent || !input.consentToRecord) {
     throw new Error("Required consents missing.")
   }
   if (!input.signerName.trim()) {
@@ -53,17 +60,19 @@ export async function saveConsent(input: SaveConsentInput): Promise<{ consentId:
   try {
     const rows = await query<{ id: string }>(
       `INSERT INTO phi.consents (
-        id, patient_hash, pharmacy_id, pharmacist_id, assessment_tx_id,
+        id, patient_hash, pharmacy_id, pharmacist_id, assessment_tx_id, vaccination_id,
         statement_version, statement_hash,
         consent_to_assess, consent_to_record, consent_to_followup,
+        consent_type, consent_to_vaccinate,
         signer_name, signer_relationship, capture_method,
         signature_png, ip_address, captured_at, created_at
       ) VALUES (
-        $1, $2, $3, $4, $5,
-        $6, $7,
-        $8, $9, $10,
-        $11, $12, $13,
-        $14, $15, NOW(), NOW()
+        $1, $2, $3, $4, $5, $6,
+        $7, $8,
+        $9, $10, $11,
+        $12, $13,
+        $14, $15, $16,
+        $17, $18, NOW(), NOW()
       )
       RETURNING id`,
       [
@@ -72,11 +81,14 @@ export async function saveConsent(input: SaveConsentInput): Promise<{ consentId:
         input.pharmacyId,
         input.pharmacistId,
         input.assessmentTxId ?? null,
+        input.vaccinationId ?? null,
         input.statementVersion,
         input.statementHash,
         input.consentToAssess,
         input.consentToRecord,
         input.consentToFollowup,
+        input.consentType ?? "minor_ailments",
+        input.consentToVaccinate ?? null,
         input.signerName.trim(),
         input.signerRelationship,
         input.captureMethod,

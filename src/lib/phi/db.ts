@@ -135,6 +135,53 @@ async function ensureSchema() {
       CREATE INDEX IF NOT EXISTS idx_consents_pharmacy ON phi.consents (pharmacy_id, captured_at DESC);
       CREATE INDEX IF NOT EXISTS idx_consents_patient   ON phi.consents (patient_hash);
       CREATE INDEX IF NOT EXISTS idx_consents_tx        ON phi.consents (assessment_tx_id);
+
+      -- Roadmap #22: extend #3's consent table with a consent_type discriminator
+      -- + vaccination-specific flag. Additive (ALTER IF NOT EXISTS) so Phase 2
+      -- self-provisions; existing minor-ailments rows default to
+      -- 'minor_ailments' and NULL consent_to_vaccinate (no backfill needed).
+      ALTER TABLE phi.consents ADD COLUMN IF NOT EXISTS consent_type TEXT NOT NULL DEFAULT 'minor_ailments';
+      ALTER TABLE phi.consents ADD COLUMN IF NOT EXISTS consent_to_vaccinate BOOLEAN;
+      ALTER TABLE phi.consents ADD COLUMN IF NOT EXISTS vaccination_id TEXT;
+      CREATE INDEX IF NOT EXISTS idx_consents_vaccination ON phi.consents (vaccination_id);
+
+      -- Roadmap #22: vaccination administration record. A sibling to the
+      -- assessment table — a vaccination has no ailment slug and a different
+      -- legal basis, so it is NOT modelled as an assessment.outcome. Shares the
+      -- patient_hash identity index discipline; scoped by pharmacy_id on every
+      -- read/write. No UPDATE/DELETE (immutability inherited from #2).
+      CREATE TABLE IF NOT EXISTS phi.vaccinations (
+        id                      TEXT PRIMARY KEY,
+        patient_hash            TEXT NOT NULL,
+        pharmacy_id             TEXT NOT NULL,
+        pharmacist_id           TEXT NOT NULL,
+        vaccination_client_id   TEXT,
+        vaccine_id              TEXT NOT NULL,
+        vaccine_name            TEXT NOT NULL,
+        outcome                 TEXT NOT NULL,
+        dose_number             INTEGER,
+        series_total            INTEGER,
+        lot_number              TEXT,
+        expiry_date             TEXT,
+        manufacturer            TEXT,
+        route                   TEXT,
+        site                    TEXT,
+        dose_volume             TEXT,
+        withhold_reason         TEXT,
+        contraindications_checked TEXT[] DEFAULT '{}',
+        administration_notes    TEXT DEFAULT '',
+        consent_id              TEXT,
+        protocol_version        TEXT,
+        created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+      CREATE INDEX IF NOT EXISTS idx_vaccinations_pharmacy
+        ON phi.vaccinations (pharmacy_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_vaccinations_patient
+        ON phi.vaccinations (patient_hash);
+      CREATE INDEX IF NOT EXISTS idx_vaccinations_lot
+        ON phi.vaccinations (pharmacy_id, lot_number);
+      CREATE INDEX IF NOT EXISTS idx_vaccinations_vaccine
+        ON phi.vaccinations (pharmacy_id, vaccine_id);
     `)
     migrated = true
   } finally {

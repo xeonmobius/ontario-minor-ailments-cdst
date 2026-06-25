@@ -21,6 +21,7 @@ type EventType =
   | "export.requested"
   | "consent.captured"
   | "signature.applied"
+  | "vaccination.administered"
 
 export async function logAuditEvent(
   eventType: EventType,

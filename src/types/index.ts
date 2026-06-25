@@ -128,6 +128,12 @@ export interface ConsentCapture {
   signatureDataUrl: string | null
   captureMethod: CaptureMethod
   capturedAt: string
+  // Vaccination consent variant (roadmap #22). The discriminator selects which
+  // statement set the captured consent belongs to; consentToVaccinate carries
+  // the vaccination-specific informed-consent-to-administer flag. Both default
+  // for the minor-ailments path, so existing call sites are unchanged.
+  consentType?: "minor_ailments" | "vaccination"
+  consentToVaccinate?: boolean
 }
 
 export interface RecalledSig {
@@ -172,6 +178,48 @@ export interface AssessmentData {
   selectedRx: SelectedRx | null
   dateOfAssessment: string
 }
+
+// Vaccination administration workflow (roadmap #22). A second, parallel clinical
+// workflow distinct from the minor-ailments assessment. The administration
+// record (vaccine, lot, expiry, site, route, dose) and the withhold/refer
+// outcome are clinical data about a specific patient persisted to fly.io only;
+// the non-PHI stock count lives on Supabase. See src/lib/vaccines/catalog.ts.
+export type AdministrationRoute = "IM" | "SC" | "ID" | "intranasal" | "oral"
+export type AdministrationSite =
+  | "left_deltoid"
+  | "right_deltoid"
+  | "left_vastus_lateralis"
+  | "right_vastus_lateralis"
+  | "left_arm"
+  | "right_arm"
+  | "nasal"
+  | "oral"
+  | "other"
+
+export interface VaccinationAdministration {
+  vaccineId: string
+  vaccineName: string
+  lotNumber: string
+  expiryDate: string
+  manufacturer: string
+  doseNumber: number
+  seriesTotal: number
+  route: AdministrationRoute
+  site: AdministrationSite
+  doseVolume: string
+  administrationNotes: string
+}
+
+export type VaccinationOutcome = "administered" | "withheld" | "referred"
+
+export type WithholdReason =
+  | "contraindication_present"
+  | "patient_declined"
+  | "acute_illness_today"
+  | "pregnancy_live_vaccine"
+  | "out_of_stock"
+  | "referred_to_physician"
+  | "other"
 
 export type AssessmentOutcome = "prescribed" | "referred" | "not_prescribed" | "abandoned"
 

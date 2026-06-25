@@ -1,4 +1,5 @@
 import { AilmentGrid } from "@/components/ailment-grid"
+import { VaccinationEntry } from "@/components/vaccination-entry"
 import { UserNav } from "@/components/user-nav"
 import { PharmacyBadge } from "@/components/pharmacy-badge"
 import { requireAuth } from "@/lib/auth-guards"
@@ -58,6 +59,9 @@ export default async function Home() {
       </header>
       <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-8">
         <AilmentGrid />
+        <div className="mt-8">
+          <VaccinationEntry />
+        </div>
       </main>
       <footer className="border-t mt-auto">
         <div className="max-w-6xl mx-auto px-6 py-4 text-center text-xs text-muted-foreground">

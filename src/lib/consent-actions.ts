@@ -10,12 +10,18 @@ import {
   CONSENT_STATEMENT_VERSION,
   MINOR_AILMENTS_CONSENT_STATEMENTS,
 } from "@/lib/consent/statements"
+import {
+  computeVaccinationStatementHash,
+  VACCINATION_CONSENT_VERSION,
+} from "@/lib/vaccines/consent-statements"
 import type { ConsentCapture, PatientIdentity } from "@/types"
 
 export interface SaveConsentPayload {
   consent: ConsentCapture
   patient: PatientIdentity
   assessmentTxId?: string
+  vaccinationId?: string
+  consentType?: "minor_ailments" | "vaccination"
 }
 
 // Phase-1 no-op stub: returns { consentId: null } without a DB call or audit
@@ -31,10 +37,14 @@ export async function saveConsentAction(
 
   if (!isPhiEnabled()) return { consentId: null }
 
-  const { consent, patient, assessmentTxId } = payload
+  const { consent, patient, assessmentTxId, vaccinationId } = payload
+  const consentType = payload.consentType ?? consent.consentType ?? "minor_ailments"
+  const isVaccination = consentType === "vaccination"
+  const expectedVersion = isVaccination ? VACCINATION_CONSENT_VERSION : CONSENT_STATEMENT_VERSION
 
   // Server-side re-validation (never trust client booleans for a legal artefact).
-  if (!consent.consentToAssess || !consent.consentToRecord) {
+  const primaryConsent = isVaccination ? consent.consentToVaccinate : consent.consentToAssess
+  if (!primaryConsent || !consent.consentToRecord) {
     throw new Error("Required consents missing.")
   }
   if (!consent.signerName.trim()) {
@@ -43,7 +53,7 @@ export async function saveConsentAction(
   if (consent.captureMethod === "signature" && !consent.signatureDataUrl) {
     throw new Error("Signature is required for capture_method=signature.")
   }
-  if (consent.statementVersion !== CONSENT_STATEMENT_VERSION) {
+  if (consent.statementVersion !== expectedVersion) {
     throw new Error("Consent statement version mismatch.")
   }
 
@@ -60,7 +70,9 @@ export async function saveConsentAction(
   const forwarded = h.get("x-forwarded-for")
   const ipAddress = forwarded?.split(",")[0]?.trim() ?? null
 
-  const statementHash = computeStatementHash(MINOR_AILMENTS_CONSENT_STATEMENTS)
+  const statementHash = isVaccination
+    ? computeVaccinationStatementHash()
+    : computeStatementHash(MINOR_AILMENTS_CONSENT_STATEMENTS)
 
   const { consentId } = await saveConsent({
     pharmacistId: profile.id,
@@ -68,11 +80,14 @@ export async function saveConsentAction(
     patientName: patient.name,
     patientDob: patient.dob,
     assessmentTxId,
+    vaccinationId,
     statementVersion: consent.statementVersion,
     statementHash,
     consentToAssess: consent.consentToAssess,
     consentToRecord: consent.consentToRecord,
     consentToFollowup: consent.consentToFollowup,
+    consentType,
+    consentToVaccinate: isVaccination ? consent.consentToVaccinate : undefined,
     signerName: consent.signerName,
     signerRelationship: consent.signerRelationship,
     captureMethod: consent.captureMethod,
