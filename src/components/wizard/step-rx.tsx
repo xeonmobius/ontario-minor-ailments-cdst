@@ -1,7 +1,8 @@
 "use client"
 
-import { Ailment, NonPrescribeReason, SelectedRx } from "@/types"
+import { Ailment, NonPrescribeReason, RecalledSig, SelectedRx } from "@/types"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -10,9 +11,16 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { NonPrescribePanel } from "./non-prescribe-panel"
 import { CitationPanel } from "./citation-panel"
 
+function formatRecallDate(iso: string): string {
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return iso
+  return d.toLocaleDateString("en-CA")
+}
+
 interface StepRxProps {
   ailment: Ailment
   selectedRx: SelectedRx | null
+  recalled?: RecalledSig | null
   onSelect: (rx: Ailment["rxOptions"][number]) => void
   onSelectedRxChange: (rx: SelectedRx) => void
   nonRxChecked: string[]
@@ -26,6 +34,7 @@ interface StepRxProps {
 export function StepRx({
   ailment,
   selectedRx,
+  recalled,
   onSelect,
   onSelectedRxChange,
   nonRxChecked,
@@ -83,6 +92,27 @@ export function StepRx({
       {selectedRx && (
         <div className="flex flex-col gap-4">
           <Separator />
+          {recalled && recalled.drug === selectedRx.drug && (
+            <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-sm text-muted-foreground" data-testid="recall-hint-same">
+              Last used for this patient on {formatRecallDate(recalled.prescribedAt)}: values pre-filled — review and edit.
+            </div>
+          )}
+          {recalled && recalled.drug !== selectedRx.drug && (
+            <div className="flex flex-col gap-2 rounded-md border border-muted-foreground/20 bg-muted/40 p-3 text-sm" data-testid="recall-hint-different">
+              <span className="text-muted-foreground">
+                Previously prescribed <span className="font-medium text-foreground">{recalled.drug}</span> ({recalled.sig}) on {formatRecallDate(recalled.prescribedAt)}.
+              </span>
+              {(() => {
+                const regimen = ailment.rxOptions.find((r) => r.drug === recalled.drug)
+                if (!regimen) return null
+                return (
+                  <Button size="sm" variant="outline" className="w-fit" onClick={() => onSelect(regimen)}>
+                    Switch to {recalled.drug}
+                  </Button>
+                )
+              })()}
+            </div>
+          )}
           <h3 className="text-lg font-semibold">Prescription Details</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">

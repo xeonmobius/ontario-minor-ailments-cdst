@@ -105,6 +105,27 @@ export interface SelectedRx extends RxOption {
   duration: string
 }
 
+export interface SigDefault {
+  sig: string
+  quantity: string
+  refills: string
+  duration: string
+}
+
+export interface PatientIdentity {
+  name: string
+  dob: string
+}
+
+export interface RecalledSig {
+  drug: string
+  sig: string
+  quantity: string
+  refills: string
+  duration: string
+  prescribedAt: string
+}
+
 export interface AssessmentData {
   ailment: Ailment
   patient: PatientInfo

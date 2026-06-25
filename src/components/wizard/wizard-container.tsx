@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import {
   AbandonmentReason,
@@ -8,6 +8,7 @@ import {
   NonPrescribeReason,
   PatientInfo,
   PharmacyDefaults,
+  RecalledSig,
   SelectedRx,
 } from "@/types"
 import { WizardNav, StepIndicator } from "./wizard-nav"
@@ -21,6 +22,8 @@ import { AbandonDialog } from "./abandon-dialog"
 import { downloadPdf } from "@/lib/pdf-helpers"
 import { reserveTxId } from "@/lib/prescription-actions"
 import { saveAssessment } from "@/lib/phi/assessment-store"
+import { getRecalledSigAction } from "@/lib/sig-recall-actions"
+import { getSigDefault } from "@/lib/clinical/sig-defaults"
 import {
   NON_PRESCRIBE_REASONS,
   REASON_TAXONOMY_VERSION,
@@ -69,6 +72,7 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
   const [nonPrescribeReason, setNonPrescribeReason] = useState<NonPrescribeReason | null>(null)
   const [nonPrescribeRationale, setNonPrescribeRationale] = useState("")
   const [abandonOpen, setAbandonOpen] = useState(false)
+  const [recalled, setRecalled] = useState<RecalledSig | null>(null)
 
   const hasRedFlags = redFlagsChecked.length > 0
   const isNonPrescribe = nonPrescribeReason !== null
@@ -95,13 +99,27 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
     setStep((s) => Math.min(3, s + 1))
   }
 
+  // Resolve the best-available pre-fill with a strict precedence:
+  // recalled (patient-specific, Phase 2) > smart-sig default (Phase 1) > generic.
+  // The recalled values apply only when the recalled drug matches the selection,
+  // because a sig is drug-specific. Every field stays pharmacist-editable.
   function handleSelectRx(rx: Ailment["rxOptions"][number]) {
+    const smart = getSigDefault(ailment.slug, rx.drug)
+    const sameDrugRecall =
+      recalled && recalled.drug === rx.drug ? recalled : null
+    const base = smart
+      ? { sig: smart.sig, quantity: smart.quantity, refills: smart.refills, duration: smart.duration }
+      : { sig: rx.dose, quantity: "1", refills: "0", duration: "" }
     setSelectedRx({
       ...rx,
-      sig: rx.dose,
-      quantity: "1",
-      refills: "0",
-      duration: "",
+      ...(sameDrugRecall
+        ? {
+            sig: sameDrugRecall.sig,
+            quantity: sameDrugRecall.quantity,
+            refills: sameDrugRecall.refills,
+            duration: sameDrugRecall.duration,
+          }
+        : base),
     })
     setNonPrescribeReason(null)
     setNonPrescribeRationale("")
@@ -122,6 +140,31 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
     setIsReferral(true)
     setStep(3)
   }
+
+  // Fetch this patient's last-used Rx for the current drug once the pharmacist
+  // reaches the Rx step. Identity is complete by step 2. Re-fires on drug change
+  // (one recall per selected drug). The action short-circuits to null in Phase 1
+  // (flag off), so this incurs no database cost until persistence is live.
+  useEffect(() => {
+    if (step !== 2) return
+    if (!patient.name || !patient.dob) return
+    const drug = selectedRx?.drug ?? ""
+    let cancelled = false
+    getRecalledSigAction({
+      ailmentId: ailment.id,
+      drug,
+      patient: { name: patient.name, dob: patient.dob },
+    })
+      .then((result) => {
+        if (!cancelled) setRecalled(result)
+      })
+      .catch(() => {
+        if (!cancelled) setRecalled(null)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [step, selectedRx?.drug, patient.name, patient.dob, ailment.id])
 
   async function handleDownloadReferral() {
     const dateOfAssessment = new Date().toLocaleDateString("en-CA")
@@ -278,6 +321,7 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
             <StepRx
               ailment={ailment}
               selectedRx={selectedRx}
+              recalled={recalled}
               onSelect={handleSelectRx}
               onSelectedRxChange={handleSelectedRxChange}
               nonRxChecked={nonRxChecked}

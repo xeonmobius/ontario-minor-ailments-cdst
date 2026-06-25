@@ -8,6 +8,7 @@ import type {
   AssessmentOutcome,
   NonPrescribeReason,
   PatientInfo,
+  RecalledSig,
   SelectedRx,
 } from "@/types"
 
@@ -164,5 +165,62 @@ export async function getAssessmentById(id: string): Promise<{ data?: Record<str
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error"
     return { error: message }
+  }
+}
+
+interface StoredSelectedRx extends SelectedRx {
+  drug: string
+  sig: string
+  quantity: string
+  refills: string
+  duration: string
+}
+
+// Last-used Rx recall (roadmap #12, Phase 2). Read-only lookup of the most
+// recent prescribed SelectedRx for this pharmacy + patient + ailment + drug.
+// Returns null when no prior assessment exists. Every query text scopes by
+// pharmacy_id + patient_hash so a cross-pharmacy recall is structurally
+// impossible. No-op (via query() returning [] ) when PHI persistence is off.
+export async function getLastUsedSig({
+  pharmacyId,
+  patientName,
+  patientDob,
+  ailmentId,
+  drug,
+}: {
+  pharmacyId: string
+  patientName: string
+  patientDob: string
+  ailmentId: string
+  drug: string
+}): Promise<RecalledSig | null> {
+  if (!isPhiEnabled()) return null
+  const identityHash = patientHash(patientName, patientDob)
+  const rows = await query<{
+    selected_rx: StoredSelectedRx | null
+    created_at: string
+  }>(
+    `SELECT selected_rx, created_at
+       FROM phi.assessments
+      WHERE pharmacy_id = $1
+        AND patient_hash = $2
+        AND ailment_id = $3
+        AND outcome = 'prescribed'
+        AND selected_rx IS NOT NULL
+        AND selected_rx->>'drug' = $4
+      ORDER BY created_at DESC
+      LIMIT 1`,
+    [pharmacyId, identityHash, ailmentId, drug],
+  )
+  if (rows.length === 0) return null
+  const rx = rows[0].selected_rx
+  if (!rx) return null
+  return {
+    drug: rx.drug,
+    sig: rx.sig,
+    quantity: rx.quantity,
+    refills: rx.refills,
+    duration: rx.duration,
+    prescribedAt: rows[0].created_at,
   }
 }
