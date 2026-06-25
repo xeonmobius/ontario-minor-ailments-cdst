@@ -9,6 +9,13 @@
       "type": "remote",
       "url": "https://mcp.supabase.com/mcp?project_ref=hawlgrpgnfsqjqhhgmfi",
       "enabled": true
+    },
+    "stripe": {
+      "type": "remote",
+      "url": "https://mcp.stripe.com",
+      "headers": {
+        "Authorization": "Bearer REDACTED_STRIPE_KEY"
+      }
     }
   }
 }
