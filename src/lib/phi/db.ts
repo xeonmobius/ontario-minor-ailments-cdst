@@ -13,13 +13,28 @@ export function getPool(): Pool {
     if (!connectionString) {
       throw new Error("DATABASE_URL is not set")
     }
-    pool = new Pool({
-      connectionString,
-      max: 5,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 10000,
-      ssl: process.env.PHI_DB_SSL === "false" ? false : { rejectUnauthorized: false },
-    })
+    const dbHost = process.env.PHI_DB_HOST
+    pool = new Pool(
+      dbHost
+        ? {
+            host: dbHost,
+            port: 5432,
+            user: process.env.PHI_DB_USER ?? "fly-user",
+            password: process.env.PHI_DB_PASSWORD ?? "",
+            database: process.env.PHI_DB_NAME ?? "cdst",
+            max: 5,
+            idleTimeoutMillis: 30000,
+            connectionTimeoutMillis: 10000,
+            ssl: process.env.PHI_DB_SSL === "false" ? false : { rejectUnauthorized: false },
+          }
+        : {
+            connectionString,
+            max: 5,
+            idleTimeoutMillis: 30000,
+            connectionTimeoutMillis: 10000,
+            ssl: process.env.PHI_DB_SSL === "false" ? false : { rejectUnauthorized: false },
+          },
+    )
   }
   return pool
 }
