@@ -31,6 +31,13 @@ export interface SaveAssessmentInput {
   reasonTaxonomyVersion?: string
   reasonTaxonomyHash?: string
   consentId?: string
+  // Pharmacist e-signature per-act binding (roadmap #11). Optional: unsigned
+  // assessments (and all Phase-1 rows) leave these null. When provided, the
+  // assessment row carries the credential id + signed_at + attestation version
+  // as the durable medico-legal authentication artefact.
+  pharmacistSignatureId?: string
+  signedAt?: string
+  signingAttestationVersion?: string
 }
 
 const VALID_NON_PRESCRIBE_REASONS: NonPrescribeReason[] = [
@@ -78,6 +85,7 @@ export async function saveAssessment(input: SaveAssessmentInput): Promise<{ id?:
         outcome, non_prescribe_reason, non_prescribe_rationale,
         abandonment_reason, reason_taxonomy_version, reason_taxonomy_hash,
         consent_id,
+        pharmacist_signature_id, signed_at, signing_attestation_version,
         created_at
       ) VALUES (
         $1, $2, $3, $4, $5,
@@ -88,6 +96,7 @@ export async function saveAssessment(input: SaveAssessmentInput): Promise<{ id?:
         $18, $19, $20,
         $21, $22, $23,
         $24,
+        $25, $26, $27,
         NOW()
       )`,
       [
@@ -115,6 +124,9 @@ export async function saveAssessment(input: SaveAssessmentInput): Promise<{ id?:
         input.reasonTaxonomyVersion ?? null,
         input.reasonTaxonomyHash ?? null,
         input.consentId ?? null,
+        input.pharmacistSignatureId ?? null,
+        input.signedAt ?? null,
+        input.signingAttestationVersion ?? null,
       ],
     )
     return { id }

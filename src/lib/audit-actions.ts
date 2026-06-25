@@ -20,6 +20,7 @@ type EventType =
   | "pdf.generated"
   | "export.requested"
   | "consent.captured"
+  | "signature.applied"
 
 export async function logAuditEvent(
   eventType: EventType,

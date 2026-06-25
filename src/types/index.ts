@@ -139,6 +139,30 @@ export interface RecalledSig {
   prescribedAt: string
 }
 
+// Pharmacist e-signature (roadmap #11). The enrolled per-pharmacist credential
+// is PHI (a biometric stroke) persisted on fly.io only; the per-act signing
+// state carries the attestation + stroke through the terminal step to the PDF.
+// The stroke is baked onto the PDF client-side so the printed/e-faxed document
+// is print-ready in-session; persistence + per-act binding light up with the
+// PHI_PERSIST_ENABLED flag (Phase 2) and no further code change.
+export type SignatureDocumentType = "prescription" | "referral"
+
+export interface PharmacistSignature {
+  id: string
+  pharmacistId: string
+  signatureDataUrl: string
+  enrolledAt: string
+  attestationVersion: string
+}
+
+export interface PharmacistSigningState {
+  attested: boolean
+  signatureDataUrl: string | null
+  attestationVersion: string
+  signedAt: string | null
+  saveAsCredential: boolean
+}
+
 export interface AssessmentData {
   ailment: Ailment
   patient: PatientInfo

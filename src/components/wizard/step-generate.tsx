@@ -1,14 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import { Ailment, ConsentCapture, PatientInfo, PharmacyDefaults, SelectedRx } from "@/types"
+import { Ailment, ConsentCapture, PatientInfo, PharmacistSignature, PharmacistSigningState, PharmacyDefaults, SelectedRx } from "@/types"
 import { downloadPdf } from "@/lib/pdf-helpers"
 import { CombinedPdf } from "@/components/combined-pdf"
 import { PatientInstructionsPdf } from "@/components/patient-instructions-pdf"
 import { ConsentPanel } from "@/components/consent/consent-panel"
+import { PharmacistSignaturePanel } from "@/components/signature/pharmacist-signature-panel"
 import { reserveTxId } from "@/lib/prescription-actions"
 import { saveAssessment } from "@/lib/phi/assessment-store"
 import { saveConsentAction } from "@/lib/consent-actions"
+import { applySignatureAction } from "@/lib/signature-actions"
 import { getPatientInstructions, type Language } from "@/lib/i18n/patient-instructions"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -25,9 +27,12 @@ interface StepGenerateProps {
   pharmacy?: PharmacyDefaults | null
   consent: ConsentCapture | null
   onConsentChange: (c: ConsentCapture | null) => void
+  enrolledSignature: PharmacistSignature | null
+  signing: PharmacistSigningState | null
+  onSigningChange: (s: PharmacistSigningState | null) => void
 }
 
-export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, symptomsChecked, nonRxChecked, pharmacy, consent, onConsentChange }: StepGenerateProps) {
+export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, symptomsChecked, nonRxChecked, pharmacy, consent, onConsentChange, enrolledSignature, signing, onSigningChange }: StepGenerateProps) {
   const dateOfAssessment = new Date().toLocaleDateString("en-CA")
   const [txId, setTxId] = useState<string | null>(null)
   const [handoutLanguage, setHandoutLanguage] = useState<Language | "both">("en")
@@ -39,7 +44,7 @@ export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, sy
   )
 
   async function handleDownload() {
-    if (!consent) return
+    if (!consent || !signing) return
     try {
       let resolvedTxId = txId
       if (!resolvedTxId) {
@@ -56,6 +61,11 @@ export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, sy
         patient: { name: patient.name, dob: patient.dob },
         assessmentTxId: resolvedTxId ?? undefined,
       })
+      // Pharmacist e-signature per-act binding (roadmap #11). Phase-1 no-op
+      // stub returns nulls; the stroke renders on the PDF from React state.
+      const sigRes = resolvedTxId
+        ? await applySignatureAction({ assessmentTxId: resolvedTxId })
+        : { signedAt: null, signatureId: null }
       const doc = <CombinedPdf
         ailment={ailment}
         patient={patient}
@@ -72,6 +82,9 @@ export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, sy
         consentCaptureMethod={consent.captureMethod}
         consentStatementVersion={consent.statementVersion}
         consentCapturedAt={consent.capturedAt}
+        pharmacistSignatureDataUrl={signing.signatureDataUrl}
+        pharmacistSignedAt={(sigRes.signedAt ?? signing.signedAt) ?? undefined}
+        pharmacistAttestationVersion={signing.attestationVersion}
       />
       await downloadPdf(doc, `prescription-${dateOfAssessment}-${resolvedTxId ?? "draft"}.pdf`)
       if (resolvedTxId) {
@@ -88,6 +101,9 @@ export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, sy
           nonRxChecked,
           isReferral: false,
           consentId: consentRes.consentId ?? undefined,
+          pharmacistSignatureId: sigRes.signatureId ?? undefined,
+          signedAt: sigRes.signedAt ?? undefined,
+          signingAttestationVersion: sigRes.signatureId ? signing.attestationVersion : undefined,
         })
       }
     } catch (err) {
@@ -148,14 +164,23 @@ export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, sy
         onChange={onConsentChange}
       />
 
+      <PharmacistSignaturePanel
+        enrolled={enrolledSignature}
+        pharmacistName={pharmacy?.pharmacistName ?? ""}
+        license={pharmacy?.provincialLicense ?? null}
+        documentType="prescription"
+        value={signing}
+        onChange={onSigningChange}
+      />
+
       <div className="flex flex-col gap-3">
-        <Button onClick={handleDownload} disabled={!consent}>
+        <Button onClick={handleDownload} disabled={!consent || !signing}>
           Download Prescription + Doctor Notification PDF
         </Button>
         <p className="text-xs text-muted-foreground">
-          {consent
-            ? "Combined single-page document with full clinical documentation, prescription, physician notification, and signature lines. Print, sign, and fax to the physician."
-            : "Capture patient consent above before producing the document."}
+          {consent && signing
+            ? "Combined single-page document with full clinical documentation, prescription, physician notification, and your applied signature. Print and fax to the physician."
+            : "Capture patient consent and your signature above before producing the document."}
         </p>
       </div>
 

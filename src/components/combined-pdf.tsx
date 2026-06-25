@@ -136,6 +136,7 @@ const styles = StyleSheet.create({
   signatureBox: { flex: 1, marginRight: 12 },
   patientSignatureBox: { flex: 1 },
   patientSignatureImage: { width: 130, height: 32, objectFit: "contain" },
+  pharmacistSignatureImage: { width: 130, height: 28, objectFit: "contain" },
   signatureLine: {
     borderBottomWidth: 1,
     borderBottomColor: DARK,
@@ -177,6 +178,9 @@ interface CombinedPdfProps {
   consentCaptureMethod?: CaptureMethod
   consentStatementVersion?: string
   consentCapturedAt?: string
+  pharmacistSignatureDataUrl?: string | null
+  pharmacistSignedAt?: string
+  pharmacistAttestationVersion?: string
 }
 
 export function CombinedPdf({
@@ -195,6 +199,9 @@ export function CombinedPdf({
   consentCaptureMethod,
   consentStatementVersion,
   consentCapturedAt,
+  pharmacistSignatureDataUrl,
+  pharmacistSignedAt,
+  pharmacistAttestationVersion,
 }: CombinedPdfProps) {
   const activeSymptoms = filterCheckedItems(ailment.symptoms, symptomsChecked)
   const activeNonRx = filterCheckedItems(ailment.nonRx, nonRxChecked)
@@ -320,8 +327,19 @@ export function CombinedPdf({
         <View style={styles.signatureSection}>
           <View style={styles.signatureBox}>
             <Text style={{ fontSize: 6.5, fontFamily: "Helvetica-Bold", color: TEAL, marginBottom: 2, textTransform: "uppercase", letterSpacing: 1 }}>Pharmacist Signature</Text>
-            <View style={styles.signatureLine} />
+            {pharmacistSignatureDataUrl ? (
+              // react-pdf Image is a PDF primitive (not a DOM img) and has no alt prop.
+              // eslint-disable-next-line jsx-a11y/alt-text
+              <Image src={pharmacistSignatureDataUrl} style={styles.pharmacistSignatureImage} />
+            ) : (
+              <View style={styles.signatureLine} />
+            )}
             <Text style={styles.signatureLabel}>{pharmacy?.pharmacistName || "__________"} — License #{pharmacy?.provincialLicense || "__________"}</Text>
+            {pharmacistSignatureDataUrl && (
+              <Text style={styles.consentAttestation}>
+                Electronically signed by {pharmacy?.pharmacistName || "__________"} (Reg #{pharmacy?.provincialLicense || "__________"}){pharmacistSignedAt ? ` on ${pharmacistSignedAt.slice(0, 10)}` : ""}{pharmacistAttestationVersion ? ` — ${pharmacistAttestationVersion}` : ""}.
+              </Text>
+            )}
           </View>
           <View style={styles.patientSignatureBox}>
             <Text style={{ fontSize: 6.5, fontFamily: "Helvetica-Bold", color: TEAL, marginBottom: 2, textTransform: "uppercase", letterSpacing: 1 }}>

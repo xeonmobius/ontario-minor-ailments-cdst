@@ -8,6 +8,8 @@ import {
   ConsentCapture,
   NonPrescribeReason,
   PatientInfo,
+  PharmacistSignature,
+  PharmacistSigningState,
   PharmacyDefaults,
   RecalledSig,
   SelectedRx,
@@ -21,10 +23,12 @@ import { ReferralPdf } from "./referral-pdf"
 import { NonPrescribePdf } from "./non-prescribe-pdf"
 import { AbandonDialog } from "./abandon-dialog"
 import { ConsentPanel } from "@/components/consent/consent-panel"
+import { PharmacistSignaturePanel } from "@/components/signature/pharmacist-signature-panel"
 import { downloadPdf } from "@/lib/pdf-helpers"
 import { reserveTxId } from "@/lib/prescription-actions"
 import { saveAssessment } from "@/lib/phi/assessment-store"
 import { saveConsentAction } from "@/lib/consent-actions"
+import { applySignatureAction } from "@/lib/signature-actions"
 import { getRecalledSigAction } from "@/lib/sig-recall-actions"
 import { getSigDefault } from "@/lib/clinical/sig-defaults"
 import {
@@ -53,9 +57,10 @@ const defaultPatient: PatientInfo = {
 interface WizardContainerProps {
   ailment: Ailment
   pharmacy: PharmacyDefaults | null
+  enrolledSignature: PharmacistSignature | null
 }
 
-export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
+export function WizardContainer({ ailment, pharmacy, enrolledSignature }: WizardContainerProps) {
   const router = useRouter()
   const [step, setStep] = useState(0)
   const [patient, setPatient] = useState<PatientInfo>(defaultPatient)
@@ -71,6 +76,7 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
   const [abandonOpen, setAbandonOpen] = useState(false)
   const [recalled, setRecalled] = useState<RecalledSig | null>(null)
   const [consent, setConsent] = useState<ConsentCapture | null>(null)
+  const [signing, setSigning] = useState<PharmacistSigningState | null>(null)
 
   const hasRedFlags = redFlagsChecked.length > 0
   const isNonPrescribe = nonPrescribeReason !== null
@@ -165,7 +171,7 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
   }, [step, selectedRx?.drug, patient.name, patient.dob, ailment.id])
 
   async function handleDownloadReferral() {
-    if (!consent) return
+    if (!consent || !signing) return
     const dateOfAssessment = new Date().toLocaleDateString("en-CA")
     const result = await reserveTxId()
     const txId = result.txId ?? null
@@ -178,6 +184,11 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
           assessmentTxId: txId,
         })
       : { consentId: null }
+    // Pharmacist e-signature per-act binding (roadmap #11). Phase-1 no-op stub
+    // returns nulls; the stroke renders on the PDF from React state regardless.
+    const sigRes = txId
+      ? await applySignatureAction({ assessmentTxId: txId })
+      : { signedAt: null, signatureId: null }
     const doc = <ReferralPdf
       ailment={ailment}
       patient={patient}
@@ -190,6 +201,9 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
       consentCaptureMethod={consent.captureMethod}
       consentStatementVersion={consent.statementVersion}
       consentCapturedAt={consent.capturedAt}
+      pharmacistSignatureDataUrl={signing.signatureDataUrl}
+      pharmacistSignedAt={(sigRes.signedAt ?? signing.signedAt) ?? undefined}
+      pharmacistAttestationVersion={signing.attestationVersion}
     />
     await downloadPdf(doc, `referral-${dateOfAssessment}${txId ? `-${txId}` : ""}.pdf`)
     if (txId) {
@@ -207,6 +221,9 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
         isReferral: true,
         outcome: "referred",
         consentId: consentRes.consentId ?? undefined,
+        pharmacistSignatureId: sigRes.signatureId ?? undefined,
+        signedAt: sigRes.signedAt ?? undefined,
+        signingAttestationVersion: sigRes.signatureId ? signing.attestationVersion : undefined,
       })
     }
   }
@@ -379,10 +396,18 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
                 value={consent}
                 onChange={setConsent}
               />
-              <Button variant="destructive" onClick={handleDownloadReferral} disabled={!consent}>
+              <PharmacistSignaturePanel
+                enrolled={enrolledSignature}
+                pharmacistName={pharmacy?.pharmacistName ?? ""}
+                license={pharmacy?.provincialLicense ?? null}
+                documentType="referral"
+                value={signing}
+                onChange={setSigning}
+              />
+              <Button variant="destructive" onClick={handleDownloadReferral} disabled={!consent || !signing}>
                 Download Referral PDF
               </Button>
-              <p className="text-xs text-muted-foreground">Print, sign, and fax this referral to the patient&apos;s family physician.</p>
+              <p className="text-xs text-muted-foreground">Print and fax this referral to the patient&apos;s family physician.</p>
             </div>
           )}
           {step === 3 && isNonPrescribe && nonPrescribeReason && (
@@ -439,6 +464,9 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
               pharmacy={pharmacy}
               consent={consent}
               onConsentChange={setConsent}
+              enrolledSignature={enrolledSignature}
+              signing={signing}
+              onSigningChange={setSigning}
             />
           )}
         </div>

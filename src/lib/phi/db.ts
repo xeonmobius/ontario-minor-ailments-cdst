@@ -80,6 +80,35 @@ async function ensureSchema() {
         ON phi.assessments (pharmacy_id, non_prescribe_reason)
         WHERE non_prescribe_reason IS NOT NULL;
 
+      -- Roadmap #11: pharmacist e-signature per-act binding columns on the
+      -- assessment row. pharmacist_signature_id forward-links the credential;
+      -- signed_at + signing_attestation_version are the write-once per-act
+      -- stamp. Additive (CREATE/ALTER IF NOT EXISTS) so Phase 2 self-provisions.
+      ALTER TABLE phi.assessments ADD COLUMN IF NOT EXISTS pharmacist_signature_id TEXT;
+      ALTER TABLE phi.assessments ADD COLUMN IF NOT EXISTS signed_at TIMESTAMPTZ;
+      ALTER TABLE phi.assessments ADD COLUMN IF NOT EXISTS signing_attestation_version TEXT;
+      CREATE INDEX IF NOT EXISTS idx_assessments_signed
+        ON phi.assessments (signed_at) WHERE signed_at IS NOT NULL;
+
+      -- Roadmap #11: the enrolled per-pharmacist e-signature credential. PHI
+      -- (a biometric stroke of an identified pharmacist) on fly.io only; never
+      -- Supabase. One current credential per pharmacist (UNIQUE); re-enrollment
+      -- overwrites the bytea. Scoped by pharmacy_id on every read/write.
+      CREATE TABLE IF NOT EXISTS phi.pharmacist_signature (
+        id                   TEXT PRIMARY KEY,
+        pharmacist_id        TEXT NOT NULL,
+        pharmacy_id          TEXT NOT NULL,
+        signature_png        BYTEA NOT NULL,
+        attestation_version  TEXT NOT NULL,
+        attestation_hash     TEXT NOT NULL,
+        enrolled_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_pharmacist_signature_one
+        ON phi.pharmacist_signature (pharmacist_id);
+      CREATE INDEX IF NOT EXISTS idx_pharmacist_signature_pharmacy
+        ON phi.pharmacist_signature (pharmacy_id);
+
       -- Roadmap #3: patient/SDM consent artefact. PHI (signer identity + the
       -- stroke image) lives here on fly.io only; never Supabase. Scoped by
       -- pharmacy_id on every read/write. assessment_tx_id back-links the
