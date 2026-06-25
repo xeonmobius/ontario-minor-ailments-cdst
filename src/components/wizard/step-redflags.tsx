@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { DifferentialPanel } from "./differential-panel"
 
 interface StepRedFlagsProps {
   ailment: Ailment
@@ -93,6 +94,7 @@ export function StepRedFlags({
 
       {!hasRedFlag && (
         <>
+          <DifferentialPanel slug={ailment.slug} />
           <div>
             <h3 className="text-base font-semibold mb-3">Presenting Symptoms</h3>
             <p className="text-xs text-muted-foreground mb-4">Check each symptom the patient is presenting with.</p>
