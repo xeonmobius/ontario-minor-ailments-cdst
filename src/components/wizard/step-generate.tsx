@@ -5,6 +5,7 @@ import { Ailment, PatientInfo, PharmacyDefaults, SelectedRx } from "@/types"
 import { downloadPdf } from "@/lib/pdf-helpers"
 import { CombinedPdf } from "@/components/combined-pdf"
 import { reserveTxId } from "@/lib/prescription-actions"
+import { saveAssessment } from "@/lib/phi/assessment-store"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -45,6 +46,21 @@ export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, sy
       />
       console.log("PDF patient data:", JSON.stringify({ doctorName: patient.doctorName, doctorLicense: patient.doctorLicense, doctorPhone: patient.doctorPhone, doctorFax: patient.doctorFax, doctorAddress: patient.doctorAddress }))
       await downloadPdf(doc, `prescription-${dateOfAssessment}-${resolvedTxId ?? "draft"}.pdf`)
+      if (resolvedTxId) {
+        await saveAssessment({
+          patient,
+          ailmentId: ailment.id,
+          ailmentName: ailment.name,
+          txId: resolvedTxId,
+          redFlagsChecked: [],
+          hasRedFlag: false,
+          symptomsChecked,
+          assessmentNotes,
+          selectedRx,
+          nonRxChecked,
+          isReferral: false,
+        })
+      }
     } catch (err) {
       console.error("PDF download failed:", err)
     }

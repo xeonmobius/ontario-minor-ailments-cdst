@@ -9,6 +9,8 @@ import { StepRx } from "./step-rx"
 import { StepGenerate } from "./step-generate"
 import { ReferralPdf } from "./referral-pdf"
 import { downloadPdf } from "@/lib/pdf-helpers"
+import { reserveTxId } from "@/lib/prescription-actions"
+import { saveAssessment } from "@/lib/phi/assessment-store"
 import { Button } from "@/components/ui/button"
 
 const defaultPatient: PatientInfo = {
@@ -86,8 +88,10 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
     setStep(3)
   }
 
-  function handleDownloadReferral() {
+  async function handleDownloadReferral() {
     const dateOfAssessment = new Date().toLocaleDateString("en-CA")
+    const result = await reserveTxId()
+    const txId = result.txId ?? null
     const doc = <ReferralPdf
       ailment={ailment}
       patient={patient}
@@ -95,7 +99,22 @@ export function WizardContainer({ ailment, pharmacy }: WizardContainerProps) {
       dateOfAssessment={dateOfAssessment}
       pharmacy={pharmacy}
     />
-    downloadPdf(doc, `referral-${dateOfAssessment}.pdf`)
+    await downloadPdf(doc, `referral-${dateOfAssessment}${txId ? `-${txId}` : ""}.pdf`)
+    if (txId) {
+      await saveAssessment({
+        patient,
+        ailmentId: ailment.id,
+        ailmentName: ailment.name,
+        txId,
+        redFlagsChecked,
+        hasRedFlag: true,
+        symptomsChecked,
+        assessmentNotes,
+        selectedRx: selectedRx,
+        nonRxChecked,
+        isReferral: true,
+      })
+    }
   }
 
   return (
