@@ -1,0 +1,11 @@
+## Implementation progress
+- [x] #2 persist-assessments-flyio (DONE — src/lib/phi/, wizard save wired, fly.io connected)
+- [ ] #4 refusal-non-prescribe-docs
+- [ ] #6 differential-diagnosis-dermnet
+- [ ] #9 evidence-citations
+- [ ] #12 smart-sig-autosuggest
+- [ ] #24 multilingual-patient-instructions
+- [ ] #5 stop-duplicating-pms-data
+- [ ] #3 digital-consent-capture
+- [ ] #11 pharmacist-e-signature
+- [ ] #22 vaccination-workflow
