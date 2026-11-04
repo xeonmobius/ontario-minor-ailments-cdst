@@ -62,8 +62,12 @@ export async function syncSubscription(
     !!data.product_id && data.product_id === process.env.POLAR_PRODUCT_PRO_ID
 
   let tier: "pro" | "basic" | null = null
-  if (eventType === "subscription.active" && productMatch) tier = "pro"
-  if (eventType === "subscription.updated" && productMatch) tier = "pro"
+  // subscription.created is Polar's initial activation event (the checkout's
+  // immediate aftermath); active/updated cover resume + plan changes. All
+  // three upgrade; only revoked downgrades.
+  if (productMatch && ["subscription.created", "subscription.active", "subscription.updated"].includes(eventType)) {
+    tier = "pro"
+  }
   if (eventType === "subscription.revoked") tier = "basic"
 
   if (!tier) return "noop"

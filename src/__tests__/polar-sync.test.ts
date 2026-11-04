@@ -104,6 +104,13 @@ describe("syncSubscription", () => {
     ])
   })
 
+  it("subscription.created (Polar's initial activation event) upgrades to pro", async () => {
+    const { supabase, writes } = mockAdmin({ ownedPharmacyId: "ph_1" })
+    const result = await syncSubscription(supabase, "subscription.created", payload())
+    expect(result).toBe("pro")
+    expect(writes[0]?.tier).toBe("pro")
+  })
+
   it("subscription.updated with matching product upgrades to pro", async () => {
     const { supabase, writes } = mockAdmin({ ownedPharmacyId: "ph_1" })
     const result = await syncSubscription(supabase, "subscription.updated", payload())
