@@ -6,11 +6,9 @@ import { createClient } from "@/lib/supabase/server"
 import { logAuditEvent } from "@/lib/audit-actions"
 import type { PharmacyMember } from "@/types"
 
-const TIER_LIMITS: Record<string, number> = {
-  basic: 1,
-  pro: 5,
-  enterprise: Infinity,
-}
+// Tier lives per-pharmacy now (ADR 0001) — profiles.subscription_tier and
+// this old per-user limit table are retired. Pharmacy creation is free;
+// USAGE is what the subscription unlocks (middleware paywall).
 
 export async function getUserPharmacies(): Promise<PharmacyMember[]> {
   const supabase = await createClient()
@@ -66,26 +64,6 @@ export async function addPharmacy(_prev: any, formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: "Not authenticated" }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("subscription_tier")
-    .eq("id", user.id)
-    .single()
-
-  const tier = profile?.subscription_tier ?? "basic"
-  const limit = TIER_LIMITS[tier] ?? 1
-
-  const { count } = await supabase
-    .from("pharmacy_members")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", user.id)
-    .eq("role", "owner")
-    .eq("is_active", true)
-
-  if ((count ?? 0) >= limit) {
-    return { error: `Your plan allows ${limit} pharmacies. Upgrade to add more.` }
-  }
-
   const name = formData.get("name") as string
   const address = formData.get("address") as string
   const city = formData.get("city") as string
@@ -107,7 +85,9 @@ export async function addPharmacy(_prev: any, formData: FormData) {
       fax,
       accreditation_number: accreditationNumber,
       created_by: user.id,
-      subscription_status: "active",
+      // Pay-to-use (ADR 0001): new pharmacies start locked until the owner
+      // subscribes; the Polar webhook flips the tier via service-role.
+      subscription_status: "inactive",
       subscription_tier: "basic",
       seats: 5,
     })

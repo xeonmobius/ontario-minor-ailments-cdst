@@ -16,58 +16,41 @@ vi.mock("next/navigation", () => ({
 }))
 
 import { addPharmacy } from "@/lib/pharmacy-actions"
+import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 
-function mockSupabase(opts: {
-  userId?: string | null
-  subscriptionTier?: string | null
-  ownerCount?: number
-}) {
-  const userId = opts.userId ?? "u-1"
-  const profilesSingle = vi.fn(() => {
-    if (opts.subscriptionTier === undefined) {
-      return Promise.resolve({ data: null, error: null })
-    }
-    return Promise.resolve({
-      data: { subscription_tier: opts.subscriptionTier },
-      error: null,
-    })
-  })
+// Under per-pharmacy pay-to-use billing (ADR 0001), creating a pharmacy is
+// free and unlimited; the SUBSCRIPTION is what unlocks usage. New pharmacies
+// must therefore start locked (subscription_status 'inactive', tier 'basic')
+// so the middleware paywall actually fires — the old per-user tier cap is
+// gone, and these tests pin that contract.
 
-  const membersChain = {
-    select: vi.fn().mockReturnThis(),
-    eq: vi.fn((key: string, _value: unknown) => {
-      if (key === "is_active") {
-        return Promise.resolve({ count: opts.ownerCount ?? 0, error: null })
-      }
-      return membersChain
+function mockSupabase(opts: { unauth?: boolean; insertError?: string | null }) {
+  const userId = opts.unauth ? null : "u-1"
+
+  const insertSingle = vi.fn(() =>
+    Promise.resolve({
+      data: opts.insertError ? null : { id: "ph_new" },
+      error: opts.insertError ? { message: opts.insertError } : null,
     }),
-  }
-
-  const pharmaciesInsertSingle = vi.fn().mockResolvedValue({
-    data: null,
-    error: { message: "Failed to create pharmacy." },
+  )
+  const pharmaciesInsert = vi.fn().mockReturnValue({
+    select: vi.fn().mockReturnValue({ single: insertSingle }),
   })
 
   const from = vi.fn((table: string) => {
-    if (table === "profiles") {
-      return {
-        select: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({ single: profilesSingle }),
-        }),
-      }
-    }
-    if (table === "pharmacy_members") {
-      return membersChain
-    }
     if (table === "pharmacies") {
-      return {
-        insert: vi.fn().mockReturnValue({
-          select: vi.fn().mockReturnValue({ single: pharmaciesInsertSingle }),
-        }),
-      }
+      return { insert: pharmaciesInsert }
     }
-    return { select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis() }
+    // pharmacy_members insert + profiles update follow the pharmacy insert.
+    return {
+      insert: vi.fn().mockResolvedValue({ error: null }),
+      update: vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue({ error: null }),
+      }),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+    }
   })
 
   const supabase = {
@@ -80,7 +63,7 @@ function mockSupabase(opts: {
   }
 
   vi.mocked(createClient).mockResolvedValue(supabase as any)
-  return supabase
+  return { supabase, pharmaciesInsert }
 }
 
 function buildForm(overrides: Record<string, string> = {}) {
@@ -95,48 +78,52 @@ function buildForm(overrides: Record<string, string> = {}) {
   return fd
 }
 
-describe("addPharmacy — tier enforcement", () => {
+describe("addPharmacy — pay-to-use defaults", () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
-  it("caps basic-tier user at 1 owned pharmacy", async () => {
-    mockSupabase({ subscriptionTier: "basic", ownerCount: 1 })
+  it("creates the pharmacy with no per-user tier cap", async () => {
+    const { supabase } = mockSupabase({})
 
-    const result = await addPharmacy(undefined, buildForm())
+    await addPharmacy(undefined, buildForm())
 
-    expect(result).toEqual({
-      error: "Your plan allows 1 pharmacies. Upgrade to add more.",
-    })
+    expect(supabase.from).toHaveBeenCalledWith("pharmacies")
+    expect(redirect).toHaveBeenCalledWith("/")
+  })
+
+  it("starts new pharmacies locked: status inactive, tier basic", async () => {
+    const { pharmaciesInsert } = mockSupabase({})
+
+    await addPharmacy(undefined, buildForm())
+
+    const payload = pharmaciesInsert.mock.calls[0]?.[0] as Record<string, unknown>
+    expect(payload.subscription_status).toBe("inactive")
+    expect(payload.subscription_tier).toBe("basic")
   })
 
   it("ignores client-supplied tier in formData", async () => {
-    mockSupabase({ subscriptionTier: "basic", ownerCount: 1 })
+    const { pharmaciesInsert } = mockSupabase({})
 
-    const result = await addPharmacy(undefined, buildForm({ tier: "enterprise" }))
+    await addPharmacy(undefined, buildForm({ tier: "enterprise" }))
 
-    expect(result).toEqual({
-      error: "Your plan allows 1 pharmacies. Upgrade to add more.",
-    })
+    const payload = pharmaciesInsert.mock.calls[0]?.[0] as Record<string, unknown>
+    expect(payload.subscription_tier).toBe("basic")
   })
 
-  it("defaults to basic when profile row is missing", async () => {
-    mockSupabase({ subscriptionTier: undefined, ownerCount: 1 })
+  it("surfaces a failure to create the pharmacy row", async () => {
+    mockSupabase({ insertError: "Failed to create pharmacy." })
 
     const result = await addPharmacy(undefined, buildForm())
 
-    expect(result).toEqual({
-      error: "Your plan allows 1 pharmacies. Upgrade to add more.",
-    })
+    expect(result).toHaveProperty("error")
   })
 
-  it("defaults to basic when profile tier is null", async () => {
-    mockSupabase({ subscriptionTier: null, ownerCount: 1 })
+  it("rejects unauthenticated callers", async () => {
+    mockSupabase({ unauth: true })
 
     const result = await addPharmacy(undefined, buildForm())
 
-    expect(result).toEqual({
-      error: "Your plan allows 1 pharmacies. Upgrade to add more.",
-    })
+    expect(result).toEqual({ error: "Not authenticated" })
   })
 })
