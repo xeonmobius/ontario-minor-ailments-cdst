@@ -1,11 +1,13 @@
 ## Implementation progress
-- [x] #2 persist-assessments-flyio (DONE — src/lib/phi/, wizard save wired, fly.io connected)
-- [ ] #4 refusal-non-prescribe-docs
-- [ ] #6 differential-diagnosis-dermnet
-- [ ] #9 evidence-citations
-- [ ] #12 smart-sig-autosuggest
-- [ ] #24 multilingual-patient-instructions
-- [ ] #5 stop-duplicating-pms-data
-- [ ] #3 digital-consent-capture
-- [ ] #11 pharmacist-e-signature
-- [ ] #22 vaccination-workflow
+- [x] #2 persist-assessments-flyio (DONE — src/lib/phi/, wizard save wired; fly.io host dropped 2026-11-03, persistence env-gated and dormant)
+- [x] #4 refusal-non-prescribe-docs (DONE 2026-06-24 — gnhf 1)
+- [x] #6 differential-diagnosis-dermnet (DONE 2026-06-24 — gnhf 1)
+- [x] #9 evidence-citations (DONE 2026-06-24 — gnhf 2)
+- [x] #12 smart-sig-autosuggest (DONE 2026-06-25 — gnhf 3)
+- [x] #24 multilingual-patient-instructions (DONE 2026-06-25 — gnhf 4)
+- [x] #5 stop-duplicating-pms-data (DONE 2026-06-25 — gnhf 5)
+- [x] #3 digital-consent-capture (DONE 2026-06-25 — gnhf 7)
+- [x] #11 pharmacist-e-signature (DONE 2026-06-25 — gnhf 8)
+- [x] #22 vaccination-workflow (DONE 2026-06-25 — gnhf 9)
+- [x] Polar billing: per-pharmacy pay-to-use (DONE 2026-11-04 — spec 2026-11-03, ADR 0001; deployed to https://cdst-app.vercel.app, sandbox-verified end-to-end)
+  - Pending: run supabase/migrations/APPLY-ALL.sql in the SQL editor; set Supabase Auth Site URL to https://cdst-app.vercel.app
