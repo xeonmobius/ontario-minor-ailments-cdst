@@ -66,6 +66,15 @@ export async function addPharmacy(_prev: any, formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: "Not authenticated" }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("subscription_tier")
+    .eq("id", user.id)
+    .single()
+
+  const tier = profile?.subscription_tier ?? "basic"
+  const limit = TIER_LIMITS[tier] ?? 1
+
   const { count } = await supabase
     .from("pharmacy_members")
     .select("*", { count: "exact", head: true })
@@ -73,8 +82,6 @@ export async function addPharmacy(_prev: any, formData: FormData) {
     .eq("role", "owner")
     .eq("is_active", true)
 
-  const tier = (formData.get("tier") as string) || "basic"
-  const limit = TIER_LIMITS[tier] ?? 1
   if ((count ?? 0) >= limit) {
     return { error: `Your plan allows ${limit} pharmacies. Upgrade to add more.` }
   }

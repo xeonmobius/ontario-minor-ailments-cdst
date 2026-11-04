@@ -12,18 +12,13 @@ export async function POST(request: Request) {
   }
 
   const cookieResponse = getResponseWithCookies()
-  const response = NextResponse.json({ success: true })
-
-  if (cookieResponse) {
-    cookieResponse.cookies.getAll().forEach((c) => {
-      response.cookies.set(c.name, c.value, {
-        path: "/",
-        sameSite: "lax",
-        httpOnly: true,
-        secure: false,
-      })
-    })
+  if (!cookieResponse) {
+    return NextResponse.json({ success: true })
   }
 
+  const response = NextResponse.json({ success: true })
+  cookieResponse.cookies.getAll().forEach((c) => {
+    response.cookies.set(c.name, c.value, c)
+  })
   return response
 }
