@@ -1,12 +1,10 @@
 import { Ailment } from "@/types"
-import Link from "next/link"
+import { GridTileLink } from "@/components/grid-tile-link"
 import {
-  Card,
   CardHeader,
   CardTitle,
   CardDescription,
 } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
 
 const AILMENT_ICONS: Record<string, string> = {
   acne: "01", "allergic-rhinitis": "02", "aphthous-ulcers": "03",
@@ -20,27 +18,22 @@ const AILMENT_ICONS: Record<string, string> = {
 export function AilmentCard({ ailment }: { ailment: Ailment }) {
   const num = AILMENT_ICONS[ailment.slug] || "·"
   return (
-    <Link href={`/assess/${ailment.slug}`} className="group">
-      <Card className={cn(
-        "h-full transition-all duration-200 hover:shadow-md hover:border-primary/30",
-        "hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-ring"
-      )}>
-        <CardHeader className="pb-3">
-          <div className="flex items-start gap-3">
-            <span className="flex-shrink-0 inline-flex items-center justify-center size-8 rounded-md bg-primary/10 text-primary text-xs font-bold tabular-nums">
-              {num}
-            </span>
-            <div className="min-w-0 flex-1">
-              <CardTitle className="text-sm font-semibold leading-snug group-hover:text-primary transition-colors">
-                {ailment.name}
-              </CardTitle>
-              <CardDescription className="text-xs mt-1 line-clamp-2">
-                {ailment.rxOptions.length} Rx option{ailment.rxOptions.length !== 1 ? "s" : ""}
-              </CardDescription>
-            </div>
+    <GridTileLink href={`/assess/${ailment.slug}`}>
+      <CardHeader className="pb-3">
+        <div className="flex items-start gap-3">
+          <span className="inline-flex size-8 flex-shrink-0 items-center justify-center rounded-md bg-primary/10 text-xs font-bold tabular-nums text-primary">
+            {num}
+          </span>
+          <div className="min-w-0 flex-1">
+            <CardTitle className="text-sm font-semibold leading-snug transition-colors group-hover:text-primary">
+              {ailment.name}
+            </CardTitle>
+            <CardDescription className="mt-1 text-xs line-clamp-2">
+              {ailment.rxOptions.length} Rx option{ailment.rxOptions.length !== 1 ? "s" : ""}
+            </CardDescription>
           </div>
-        </CardHeader>
-      </Card>
-    </Link>
+        </div>
+      </CardHeader>
+    </GridTileLink>
   )
 }
