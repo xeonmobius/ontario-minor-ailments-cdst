@@ -73,17 +73,20 @@ export async function signup(_prev: any, formData: FormData) {
       .single()
 
     if (newPharmacy) {
+      // Membership must exist before the profiles upsert: the privilege guard
+      // (critical fix 2, 2026-11-05) validates pharmacy_id against active
+      // memberships.
+      await supabase.from("pharmacy_members").insert({
+        user_id: authData.user.id,
+        pharmacy_id: newPharmacy.id,
+        role: "owner",
+      })
       await supabase.from("profiles").upsert({
         id: authData.user.id,
         pharmacy_id: newPharmacy.id,
         full_name: fullName,
         email,
         province: "Ontario",
-      })
-      await supabase.from("pharmacy_members").insert({
-        user_id: authData.user.id,
-        pharmacy_id: newPharmacy.id,
-        role: "owner",
       })
     }
   }
@@ -102,11 +105,18 @@ export async function signupWithInvite(formData: FormData) {
   const province = formData.get("province") as string
   const token = formData.get("token") as string
 
-  const { data: invite, error: inviteError } = await supabase
-    .from("invitations")
-    .select("pharmacy_id, email, expires_at, accepted_at")
-    .eq("token", token)
-    .single()
+  // Invitations are RLS-locked to pharmacy members (critical fix 3,
+  // 2026-11-05): the accepting user isn't a member yet, so validation goes
+  // through the SECURITY DEFINER RPC instead of a direct table read.
+  const { data: inviteRow, error: inviteError } = await supabase
+    .rpc("validate_invitation", { p_token: token })
+    .maybeSingle()
+  const invite = inviteRow as {
+    pharmacy_id: string
+    email: string
+    expires_at: string
+    accepted_at: string | null
+  } | null
 
   if (inviteError || !invite) {
     return { error: "Invalid or expired invitation." }
@@ -144,6 +154,12 @@ export async function signupWithInvite(formData: FormData) {
   }
 
   if (authData.user) {
+    // Membership must exist before the profiles upsert (see signup above).
+    await supabase.from("pharmacy_members").insert({
+      user_id: authData.user.id,
+      pharmacy_id: invite.pharmacy_id,
+      role: "pharmacist",
+    })
     await supabase.from("profiles").upsert({
       id: authData.user.id,
       pharmacy_id: invite.pharmacy_id,
@@ -152,12 +168,9 @@ export async function signupWithInvite(formData: FormData) {
       province,
       provincial_license: provincialLicense,
     })
-    await supabase.from("pharmacy_members").insert({
-      user_id: authData.user.id,
-      pharmacy_id: invite.pharmacy_id,
-      role: "pharmacist",
-    })
-    await supabase.from("invitations").update({ accepted_at: new Date().toISOString() }).eq("token", token)
+    // Acceptance is an RPC — no user-role UPDATE policy exists on
+    // invitations anymore.
+    await supabase.rpc("accept_invitation", { p_token: token, p_email: email })
   }
 
   revalidatePath("/", "layout")
