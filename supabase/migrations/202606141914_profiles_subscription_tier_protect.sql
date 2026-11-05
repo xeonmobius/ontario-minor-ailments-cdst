@@ -22,6 +22,7 @@ BEGIN
 END;
 $$;
 
+DROP TRIGGER IF EXISTS profiles_protect_subscription_tier ON public.profiles;
 CREATE TRIGGER profiles_protect_subscription_tier
   BEFORE UPDATE OF subscription_tier ON public.profiles
   FOR EACH ROW

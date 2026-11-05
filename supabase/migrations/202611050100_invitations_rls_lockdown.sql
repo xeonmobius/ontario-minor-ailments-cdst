@@ -14,6 +14,9 @@ ALTER TABLE public.invitations ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS anyone_accept_invite ON public.invitations;
 DROP POLICY IF EXISTS owners_manage_invitations ON public.invitations;
+-- Also drop our own policies so the whole APPLY-ALL paste is re-runnable.
+DROP POLICY IF EXISTS invitations_select_members ON public.invitations;
+DROP POLICY IF EXISTS invitations_insert_owner ON public.invitations;
 
 CREATE POLICY invitations_select_members ON public.invitations
   FOR SELECT TO authenticated
