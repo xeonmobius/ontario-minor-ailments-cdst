@@ -1,5 +1,7 @@
 "use client"
 
+import { ErrorBanner } from "@/components/error-banner"
+
 import { useEffect, useState } from "react"
 import { useActionState } from "react"
 import Link from "next/link"
@@ -59,9 +61,9 @@ export default function ResetPasswordPage() {
         </div>
 
         {(state as any)?.error && (
-          <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+          <ErrorBanner>
             {(state as any).error}
-          </div>
+          </ErrorBanner>
         )}
 
         <form action={formAction} className="space-y-4">

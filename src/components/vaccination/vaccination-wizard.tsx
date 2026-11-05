@@ -1,5 +1,7 @@
 "use client"
 
+import { ErrorBanner } from "@/components/error-banner"
+
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import type {
@@ -250,10 +252,10 @@ export function VaccinationWizard({ vaccine, pharmacy }: VaccinationWizardProps)
                 })}
               </div>
               {hasWithholdContraindication && (
-                <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                <ErrorBanner>
                   A withhold contraindication is checked — the vaccine will not be administered.
                   Continue to document the withhold or referral.
-                </p>
+                </ErrorBanner>
               )}
             </div>
           )}

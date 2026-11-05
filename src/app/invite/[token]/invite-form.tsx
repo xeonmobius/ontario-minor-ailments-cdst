@@ -1,5 +1,7 @@
 "use client"
 
+import { ErrorBanner } from "@/components/error-banner"
+
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -37,9 +39,9 @@ export function InviteForm({ token }: { token: string }) {
         </div>
 
         {error && (
-          <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+          <ErrorBanner>
             {error}
-          </div>
+          </ErrorBanner>
         )}
 
         <form action={handleSubmit} className="space-y-4">

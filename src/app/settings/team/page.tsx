@@ -1,6 +1,6 @@
 import { requireRole } from "@/lib/auth-guards"
 import { createClient } from "@/lib/supabase/server"
-import { BackButton } from "@/components/back-button"
+import { PageShell } from "@/components/page-shell"
 import { InviteForm } from "./invite-form"
 import { TeamList } from "./team-list"
 
@@ -28,17 +28,9 @@ export default async function TeamPage() {
   }))
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b bg-card">
-        <div className="max-w-3xl mx-auto px-6 py-4 flex items-center gap-3">
-          <BackButton />
-          <h1 className="text-lg font-bold tracking-tight">Manage Team</h1>
-        </div>
-      </header>
-      <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-8 space-y-8">
-        <InviteForm />
-        <TeamList members={flatMembers} invitations={invitations ?? []} />
-      </main>
-    </div>
+    <PageShell title="Manage Team" mainClassName="space-y-8">
+      <InviteForm />
+      <TeamList members={flatMembers} invitations={invitations ?? []} />
+    </PageShell>
   )
 }

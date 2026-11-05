@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation"
 import { getAilmentBySlug } from "@/lib/ailments"
 import { WizardContainer } from "@/components/wizard/wizard-container"
-import { BackButton } from "@/components/back-button"
+import { PageShell } from "@/components/page-shell"
 import { requireAuth } from "@/lib/auth-guards"
 import { createClient } from "@/lib/supabase/server"
 import { getSignatureAction } from "@/lib/signature-actions"
@@ -49,15 +49,8 @@ export default async function AssessPage({
   const enrolledSignature = await getSignatureAction()
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b bg-card">
-        <div className="max-w-3xl mx-auto px-6 py-3">
-          <BackButton />
-        </div>
-      </header>
-      <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-8">
-        <WizardContainer ailment={ailment} pharmacy={pharmacyDefaults} enrolledSignature={enrolledSignature} />
-      </main>
-    </div>
+    <PageShell>
+      <WizardContainer ailment={ailment} pharmacy={pharmacyDefaults} enrolledSignature={enrolledSignature} />
+    </PageShell>
   )
 }

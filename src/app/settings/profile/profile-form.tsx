@@ -1,5 +1,7 @@
 "use client"
 
+import { ErrorBanner } from "@/components/error-banner"
+
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
@@ -147,9 +149,9 @@ export function ProfileForm({
       <Separator />
       <p className="text-sm font-medium text-muted-foreground">Change Email</p>
       {emailStatus?.error && (
-        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+        <ErrorBanner>
           {emailStatus.error}
-        </div>
+        </ErrorBanner>
       )}
       {emailStatus?.success && (
         <div className="rounded-md bg-green-100 p-3 text-sm text-green-800">
@@ -169,9 +171,9 @@ export function ProfileForm({
       <Separator />
       <p className="text-sm font-medium text-muted-foreground">Change Password</p>
       {passwordStatus?.error && (
-        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+        <ErrorBanner>
           {passwordStatus.error}
-        </div>
+        </ErrorBanner>
       )}
       {passwordStatus?.success && (
         <div className="rounded-md bg-green-100 p-3 text-sm text-green-800">

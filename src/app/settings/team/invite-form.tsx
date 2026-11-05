@@ -1,5 +1,7 @@
 "use client"
 
+import { ErrorBanner } from "@/components/error-banner"
+
 import { useState } from "react"
 import { createInvitation } from "@/lib/auth-actions"
 import { Button } from "@/components/ui/button"
@@ -27,7 +29,7 @@ export function InviteForm() {
     <div className="space-y-3">
       <h2 className="text-sm font-semibold">Invite Pharmacist</h2>
       {error && (
-        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</div>
+        <ErrorBanner>{error}</ErrorBanner>
       )}
       {message && (
         <div className="rounded-md bg-primary/10 p-3 text-sm text-primary">{message}</div>

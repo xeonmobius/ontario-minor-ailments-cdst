@@ -1,6 +1,9 @@
 import { requireAuth } from "@/lib/auth-guards"
 import { createClient } from "@/lib/supabase/server"
-import { BackButton } from "@/components/back-button"
+import { PageShell } from "@/components/page-shell"
+import { Card, CardContent } from "@/components/ui/card"
+import { buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 export const metadata = { title: "Billing — CDST" }
 
@@ -34,17 +37,9 @@ export default async function BillingPage() {
 
   if (!pharmacy) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <header className="border-b bg-card">
-          <div className="max-w-3xl mx-auto px-6 py-4 flex items-center gap-3">
-            <BackButton />
-            <h1 className="text-lg font-bold tracking-tight">Billing</h1>
-          </div>
-        </header>
-        <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-8">
-          <p>No active pharmacy. Create one under Pharmacy settings first.</p>
-        </main>
-      </div>
+      <PageShell title="Billing">
+        <p>No active pharmacy. Create one under Pharmacy settings first.</p>
+      </PageShell>
     )
   }
 
@@ -52,15 +47,9 @@ export default async function BillingPage() {
   const isPro = pharmacy.subscription_tier === "pro"
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b bg-card">
-        <div className="max-w-3xl mx-auto px-6 py-4 flex items-center gap-3">
-          <BackButton />
-          <h1 className="text-lg font-bold tracking-tight">Billing</h1>
-        </div>
-      </header>
-      <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-8 space-y-6">
-        <section className="rounded-lg border bg-card p-6 space-y-4">
+    <PageShell title="Billing" mainClassName="space-y-6">
+      <Card>
+        <CardContent className="space-y-4">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-sm text-muted-foreground">Subscription for</p>
@@ -87,14 +76,14 @@ export default async function BillingPage() {
             isPro ? (
               <a
                 href="/api/polar/portal"
-                className="inline-flex h-10 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                className={cn(buttonVariants({ size: "lg" }))}
               >
                 Manage subscription
               </a>
             ) : (
               <a
                 href={`/api/polar/checkout?pharmacy=${encodeURIComponent(profile.pharmacyId ?? "")}`}
-                className="inline-flex h-10 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                className={cn(buttonVariants({ size: "lg" }))}
               >
                 Upgrade to Pro
               </a>
@@ -104,8 +93,8 @@ export default async function BillingPage() {
               Billing is managed by the pharmacy owner.
             </p>
           )}
-        </section>
-      </main>
-    </div>
+        </CardContent>
+      </Card>
+    </PageShell>
   )
 }

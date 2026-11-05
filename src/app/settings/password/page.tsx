@@ -2,7 +2,8 @@
 
 import { useActionState } from "react"
 import { changePassword } from "@/lib/auth-actions"
-import { BackButton } from "@/components/back-button"
+import { PageShell } from "@/components/page-shell"
+import { ErrorBanner } from "@/components/error-banner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,24 +14,16 @@ export default function ChangePasswordPage() {
 
   if (success) {
     return (
-      <div className="space-y-4 max-w-md">
-        <BackButton />
-        <h1 className="text-2xl font-bold tracking-tight">Password updated</h1>
+      <PageShell title="Change password" mainClassName="max-w-md space-y-4">
+        <h2 className="text-2xl font-bold tracking-tight">Password updated</h2>
         <p className="text-sm text-muted-foreground">Your password has been changed successfully.</p>
-      </div>
+      </PageShell>
     )
   }
 
   return (
-    <div className="space-y-6 max-w-md">
-      <BackButton />
-      <h1 className="text-2xl font-bold tracking-tight">Change password</h1>
-
-      {(state as any)?.error && (
-        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-          {(state as any).error}
-        </div>
-      )}
+    <PageShell title="Change password" mainClassName="max-w-md space-y-6">
+      {(state as any)?.error && <ErrorBanner>{(state as any).error}</ErrorBanner>}
 
       <form action={formAction} className="space-y-4">
         <div className="space-y-2">
@@ -49,6 +42,6 @@ export default function ChangePasswordPage() {
           {pending ? "Updating..." : "Update password"}
         </Button>
       </form>
-    </div>
+    </PageShell>
   )
 }
