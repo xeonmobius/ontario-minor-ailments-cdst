@@ -7,10 +7,11 @@ import { ErrorBanner } from "@/components/error-banner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import type { ActionState } from "@/lib/action-state"
 
 export default function ChangePasswordPage() {
   const [state, formAction, pending] = useActionState(changePassword, null)
-  const success = (state as any)?.success
+  const success = (state as ActionState | null)?.success
 
   if (success) {
     return (
@@ -23,7 +24,7 @@ export default function ChangePasswordPage() {
 
   return (
     <PageShell title="Change password" mainClassName="max-w-md space-y-6">
-      {(state as any)?.error && <ErrorBanner>{(state as any).error}</ErrorBanner>}
+      {(state as ActionState | null)?.error && <ErrorBanner>{(state as ActionState).error}</ErrorBanner>}
 
       <form action={formAction} className="space-y-4">
         <div className="space-y-2">

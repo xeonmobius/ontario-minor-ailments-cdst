@@ -8,6 +8,7 @@ import { login } from "@/lib/auth-actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import type { ActionState } from "@/lib/action-state"
 
 export default function LoginPage() {
   const [state, formAction, pending] = useActionState(login, null)
@@ -22,9 +23,9 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {(state as any)?.error && (
+        {(state as ActionState | null)?.error && (
           <ErrorBanner>
-            {(state as any).error}
+            {(state as ActionState).error}
           </ErrorBanner>
         )}
 

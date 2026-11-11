@@ -8,10 +8,11 @@ import { forgotPassword } from "@/lib/auth-actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import type { ActionState } from "@/lib/action-state"
 
 export default function ForgotPasswordPage() {
   const [state, formAction, pending] = useActionState(forgotPassword, null)
-  const sent = (state as any)?.success
+  const sent = (state as ActionState | null)?.success
 
   if (sent) {
     return (
@@ -39,9 +40,9 @@ export default function ForgotPasswordPage() {
           </p>
         </div>
 
-        {(state as any)?.error && (
+        {(state as ActionState | null)?.error && (
           <ErrorBanner>
-            {(state as any).error}
+            {(state as ActionState).error}
           </ErrorBanner>
         )}
 

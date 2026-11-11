@@ -8,6 +8,7 @@ import { signup } from "@/lib/auth-actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import type { ActionState } from "@/lib/action-state"
 
 export default function SignupPage() {
   const [state, formAction, pending] = useActionState(signup, null)
@@ -22,9 +23,9 @@ export default function SignupPage() {
           </p>
         </div>
 
-        {(state as any)?.error && (
+        {(state as ActionState | null)?.error && (
           <ErrorBanner>
-            {(state as any).error}
+            {(state as ActionState).error}
           </ErrorBanner>
         )}
 

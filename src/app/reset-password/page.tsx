@@ -9,11 +9,12 @@ import { resetPassword } from "@/lib/auth-actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import type { ActionState } from "@/lib/action-state"
 
 export default function ResetPasswordPage() {
   const [state, formAction, pending] = useActionState(resetPassword, null)
   const [hasSession, setHasSession] = useState(false)
-  const success = (state as any)?.success
+  const success = (state as ActionState | null)?.success
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.location.hash) {
@@ -60,9 +61,9 @@ export default function ResetPasswordPage() {
           <h1 className="text-2xl font-bold tracking-tight">Set new password</h1>
         </div>
 
-        {(state as any)?.error && (
+        {(state as ActionState | null)?.error && (
           <ErrorBanner>
-            {(state as any).error}
+            {(state as ActionState).error}
           </ErrorBanner>
         )}
 
