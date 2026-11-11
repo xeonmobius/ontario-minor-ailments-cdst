@@ -42,7 +42,7 @@ export function StepPatient({ patient, onChange }: StepPatientProps) {
         <div className="flex flex-col gap-2">
           <Label>Sex *</Label>
           <div className="flex gap-4 pt-2">
-            {["Male", "Female", "Other"].map((option) => {
+            {["Male", "Female"].map((option) => {
               const id = `sex-${option.toLowerCase()}`
               return (
                 <div key={option} className="flex items-center gap-2">
