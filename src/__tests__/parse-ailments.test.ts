@@ -1,10 +1,15 @@
 import { describe, it, expect } from "vitest"
 import { parseAilments, parseAilmentFile } from "../lib/parse-ailments"
+import fs from "fs"
 import path from "path"
 
 const CARDS_DIR = path.resolve(__dirname, "../../../Ontario-Minor-Ailments-Cards")
+// The clinical cards live OUTSIDE the repo (workspace sibling, source of
+// truth) — CI checkouts don't have them, so these tests skip there rather
+// than fail on ENOENT. Run them locally where the cards exist.
+const HAVE_CARDS = fs.existsSync(CARDS_DIR)
 
-describe("parseAilments", () => {
+describe.skipIf(!HAVE_CARDS)("parseAilments", () => {
   it("parses all 19 ailment cards", () => {
     const ailments = parseAilments(CARDS_DIR)
     expect(ailments).toHaveLength(19)
