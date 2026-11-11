@@ -9,13 +9,13 @@ export default async function Home() {
   return (
     <AppShell
       title="Ontario Minor Ailments"
-      subtitle="Clinical Decision Support Tool — O. Reg. 256/24"
+      subtitle="Clinical Decision Support Tool"
       leading={
         <div className="flex size-9 items-center justify-center rounded-lg bg-primary text-sm font-bold tracking-tight text-primary-foreground">
           Rx
         </div>
       }
-      footer="Ontario Minor Ailment Prescribing per O. Reg. 256/24 — For pharmacist use only"
+      footer="Ontario Minor Ailment Prescribing — For pharmacist use only"
       profile={profile}
       pharmacyName={pharmacyName}
       memberships={memberships}

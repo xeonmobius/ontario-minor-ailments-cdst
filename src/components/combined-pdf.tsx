@@ -211,7 +211,7 @@ export function CombinedPdf({
         <View style={styles.headerRow}>
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>PRESCRIPTION</Text>
-            <Text style={styles.subtitle}>{ailment.name} — O. Reg. 256/24</Text>
+            <Text style={styles.subtitle}>{ailment.name}</Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
             <Text style={styles.confidentialBadge}>CONFIDENTIAL</Text>
@@ -357,7 +357,7 @@ export function CombinedPdf({
 
         <View style={styles.footerDivider} />
         <View style={styles.phipaBox}>
-          <Text>CONFIDENTIAL — Privileged health information under PHIPA. Red flags screened and ruled out prior to prescribing per O. Reg. 256/24. Allergy, drug-interaction, and pregnancy/lactation screening are performed in the pharmacy management system and are not duplicated by this assessment.</Text>
+          <Text>CONFIDENTIAL — Privileged health information under PHIPA. Red flags screened and ruled out prior to prescribing. Allergy, drug-interaction, and pregnancy/lactation screening are performed in the pharmacy management system and are not duplicated by this assessment.</Text>
           {consentCaptureMethod && (
             <Text style={styles.consentAttestation}>
               Patient/SDM consent captured {consentCaptureMethod === "verbal_attested" ? "verbally" : "in-person"}
@@ -368,7 +368,7 @@ export function CombinedPdf({
             </Text>
           )}
         </View>
-        <Text style={styles.footerText}>Ontario Minor Ailments CDST — O. Reg. 256/24 under the Pharmacy Act</Text>
+        <Text style={styles.footerText}>Ontario Minor Ailments CDST</Text>
       </Page>
     </Document>
   )

@@ -3,8 +3,6 @@
 import { useState } from "react"
 import { Ailment, ConsentCapture, PatientInfo, PharmacistSignature, PharmacistSigningState, PharmacyDefaults, SelectedRx } from "@/types"
 import { downloadPdf } from "@/lib/pdf-helpers"
-import { CombinedPdf } from "@/components/combined-pdf"
-import { PatientInstructionsPdf } from "@/components/patient-instructions-pdf"
 import { ConsentPanel } from "@/components/consent/consent-panel"
 import { PharmacistSignaturePanel } from "@/components/signature/pharmacist-signature-panel"
 import { reserveTxId } from "@/lib/prescription-actions"
@@ -66,6 +64,7 @@ export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, sy
       const sigRes = resolvedTxId
         ? await applySignatureAction({ assessmentTxId: resolvedTxId })
         : { signedAt: null, signatureId: null }
+      const { CombinedPdf } = await import("@/components/combined-pdf")
       const doc = <CombinedPdf
         ailment={ailment}
         patient={patient}
@@ -113,6 +112,7 @@ export function StepGenerate({ ailment, patient, selectedRx, assessmentNotes, sy
 
   async function handleDownloadHandout() {
     try {
+      const { PatientInstructionsPdf } = await import("@/components/patient-instructions-pdf")
       const doc = <PatientInstructionsPdf
         ailment={ailment}
         selectedRx={selectedRx}

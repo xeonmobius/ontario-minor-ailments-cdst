@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Ontario Minor Ailments CDST",
-  description: "Clinical Decision Support Tool for Ontario pharmacists — O. Reg. 256/24",
+  description: "Clinical Decision Support Tool for Ontario pharmacists",
 }
 
 export default function RootLayout({

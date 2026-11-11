@@ -19,8 +19,8 @@ import { StepPatient } from "./step-patient"
 import { StepRedFlags } from "./step-redflags"
 import { StepRx } from "./step-rx"
 import { StepGenerate } from "./step-generate"
-import { ReferralPdf } from "./referral-pdf"
-import { NonPrescribePdf } from "./non-prescribe-pdf"
+// PDF documents (~1.2 MB via @react-pdf/renderer) load on demand at
+// download time — see pdf-helpers. Never import them statically.
 import { AbandonDialog } from "./abandon-dialog"
 import { ConsentPanel } from "@/components/consent/consent-panel"
 import { PharmacistSignaturePanel } from "@/components/signature/pharmacist-signature-panel"
@@ -189,6 +189,7 @@ export function WizardContainer({ ailment, pharmacy, enrolledSignature }: Wizard
     const sigRes = txId
       ? await applySignatureAction({ assessmentTxId: txId })
       : { signedAt: null, signatureId: null }
+    const { ReferralPdf } = await import("./referral-pdf")
     const doc = <ReferralPdf
       ailment={ailment}
       patient={patient}
@@ -236,6 +237,7 @@ export function WizardContainer({ ailment, pharmacy, enrolledSignature }: Wizard
 
     try {
       if (nonPrescribeReason === "referred_to_physician") {
+        const { ReferralPdf } = await import("./referral-pdf")
         const doc = (
           <ReferralPdf
             ailment={ailment}
@@ -249,6 +251,7 @@ export function WizardContainer({ ailment, pharmacy, enrolledSignature }: Wizard
         )
         await downloadPdf(doc, `referral-${dateOfAssessment}.pdf`)
       } else {
+        const { NonPrescribePdf } = await import("./non-prescribe-pdf")
         const doc = (
           <NonPrescribePdf
             ailment={ailment}
@@ -327,7 +330,7 @@ export function WizardContainer({ ailment, pharmacy, enrolledSignature }: Wizard
           </span>
           <h2 className="text-xl font-bold tracking-tight">{ailment.name}</h2>
         </div>
-        <p className="text-xs text-muted-foreground pl-8">Ontario Minor Ailment Assessment — O. Reg. 256/24</p>
+        <p className="text-xs text-muted-foreground pl-8">Ontario Minor Ailment Assessment</p>
       </div>
 
       <StepIndicator step={step} />

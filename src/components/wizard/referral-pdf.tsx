@@ -198,7 +198,7 @@ export function ReferralPdf({
         <View style={styles.headerRow}>
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>REFERRAL</Text>
-            <Text style={styles.subtitle}>{ailment.name} — O. Reg. 256/24</Text>
+            <Text style={styles.subtitle}>{ailment.name}</Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
             <Text style={styles.confidentialBadge}>CONFIDENTIAL</Text>
@@ -303,8 +303,8 @@ export function ReferralPdf({
         <View style={styles.phipaBox}>
           <Text>
             {isNonRedFlag
-              ? "CONFIDENTIAL — Privileged health information under PHIPA. Patient referred for physician review per O. Reg. 256/24. Allergy, drug-interaction, and pregnancy/lactation screening are performed in the pharmacy management system and are not duplicated by this assessment."
-              : "CONFIDENTIAL — Privileged health information under PHIPA. Patient referred to primary care physician due to identified red flags per O. Reg. 256/24. Allergy, drug-interaction, and pregnancy/lactation screening are performed in the pharmacy management system and are not duplicated by this assessment."}
+              ? "CONFIDENTIAL — Privileged health information under PHIPA. Patient referred for physician review. Allergy, drug-interaction, and pregnancy/lactation screening are performed in the pharmacy management system and are not duplicated by this assessment."
+              : "CONFIDENTIAL — Privileged health information under PHIPA. Patient referred to primary care physician due to identified red flags. Allergy, drug-interaction, and pregnancy/lactation screening are performed in the pharmacy management system and are not duplicated by this assessment."}
           </Text>
           {consentCaptureMethod && (
             <Text style={styles.consentAttestation}>
@@ -316,7 +316,7 @@ export function ReferralPdf({
             </Text>
           )}
         </View>
-        <Text style={styles.footerText}>Ontario Minor Ailments CDST — O. Reg. 256/24 under the Pharmacy Act</Text>
+        <Text style={styles.footerText}>Ontario Minor Ailments CDST</Text>
       </Page>
     </Document>
   )

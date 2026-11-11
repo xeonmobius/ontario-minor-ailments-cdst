@@ -19,7 +19,8 @@ import { StepPatient } from "@/components/wizard/step-patient"
 import { VaccinationConsentPanel } from "./vaccination-consent-panel"
 import { InventoryPicker, AdministrationForm } from "./inventory-picker"
 import { WithholdPanel } from "./withhold-panel"
-import { VaccinationRecordPdf } from "./vaccination-record-pdf"
+// VaccinationRecordPdf (~1.2 MB via @react-pdf/renderer) loads on demand
+// at record-generation time — see pdf-helpers.
 import { downloadPdf } from "@/lib/pdf-helpers"
 import { saveVaccinationAction } from "@/lib/vaccination-actions"
 import { saveConsentAction } from "@/lib/consent-actions"
@@ -156,6 +157,7 @@ export function VaccinationWizard({ vaccine, pharmacy }: VaccinationWizardProps)
       }
 
       // 4. Document — produced client-side as the durable legal artefact.
+      const { VaccinationRecordPdf } = await import("./vaccination-record-pdf")
       const doc = (
         <VaccinationRecordPdf
           vaccine={vaccine}

@@ -184,7 +184,7 @@ export function NonPrescribePdf({
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>ASSESSMENT RECORD</Text>
             <Text style={styles.subtitle}>
-              {ailment.name} — NO PRESCRIPTION ISSUED — O. Reg. 256/24
+              {ailment.name} — NO PRESCRIPTION ISSUED
             </Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
@@ -280,7 +280,7 @@ export function NonPrescribePdf({
         <View style={styles.footerDivider} />
         <View style={styles.phipaBox}>
           <Text>
-            CONFIDENTIAL — Privileged health information under PHIPA. Assessment completed; no prescription issued per O. Reg. 256/24. Reason recorded above. Allergy, drug-interaction, and pregnancy/lactation screening are performed in the pharmacy management system and are not duplicated by this assessment.
+            CONFIDENTIAL — Privileged health information under PHIPA. Assessment completed; no prescription issued. Reason recorded above. Allergy, drug-interaction, and pregnancy/lactation screening are performed in the pharmacy management system and are not duplicated by this assessment.
           </Text>
         </View>
         {consentCaptureMethod && (
@@ -290,7 +290,7 @@ export function NonPrescribePdf({
             {consentStatementVersion ? ` — statement version ${consentStatementVersion}` : ""}.
           </Text>
         )}
-        <Text style={styles.footerText}>Ontario Minor Ailments CDST — O. Reg. 256/24 under the Pharmacy Act</Text>
+        <Text style={styles.footerText}>Ontario Minor Ailments CDST</Text>
       </Page>
     </Document>
   )
