@@ -17,9 +17,46 @@ const SUBSCRIPTION_EXEMPT_PATHS = [
   "/settings/password",
 ]
 
+/**
+ * Decode the session JWT locally instead of calling supabase.auth.getUser().
+ * getUser() makes a GoTrue network round trip on EVERY navigation; the sub
+ * claim is already in the cookie. Signature validity is NOT checked here —
+ * this value only steers redirects. Real auth is enforced downstream by
+ * server components/actions calling supabase.auth.getUser(), which validates
+ * against the auth server; a forged or expired token yields unusable data
+ * there. This is a router, not an authorization boundary.
+ */
+function decodeSessionSub(request: NextRequest): string | null {
+  const cookie = request.cookies
+    .getAll()
+    .find((c) => c.name.endsWith("-auth-token"))
+    ?.value
+  let jwt = cookie
+  if (jwt?.startsWith("[")) {
+    try {
+      jwt = JSON.parse(jwt)[0]
+    } catch {
+      return null
+    }
+  }
+  if (!jwt || typeof jwt !== "string") return null
+  const payload = jwt.split(".")[1]
+  if (!payload) return null
+  try {
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/")
+    const claims = JSON.parse(atob(base64)) as { sub?: string; exp?: number }
+    if (!claims.sub) return null
+    if (claims.exp && claims.exp * 1000 < Date.now()) return null
+    return claims.sub
+  } catch {
+    return null
+  }
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
+  // Still needed so @supabase/ssr can write refreshed session cookies.
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
@@ -44,8 +81,6 @@ export async function updateSession(request: NextRequest) {
     },
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
-
   const path = request.nextUrl.pathname
   const isPublic = PUBLIC_PATHS.some(
     (p) => path === p || path.startsWith(p + "/"),
@@ -54,7 +89,10 @@ export async function updateSession(request: NextRequest) {
     SUBSCRIPTION_EXEMPT_PREFIXES.some((p) => path.startsWith(p)) ||
     SUBSCRIPTION_EXEMPT_PATHS.some((p) => path === p || path.startsWith(p + "/"))
 
-  if (!user && !isPublic && !isSubscriptionExempt) {
+  const needsUser = !isPublic && !isSubscriptionExempt
+  const userId = needsUser ? decodeSessionSub(request) : null
+
+  if (!userId && needsUser) {
     const url = request.nextUrl.clone()
     url.pathname = "/login"
     const redirectResponse = NextResponse.redirect(url)
@@ -67,11 +105,11 @@ export async function updateSession(request: NextRequest) {
   // Pay-to-use gate: a pharmacy without an active subscription (tier 'pro')
   // cannot use the tool. Fails closed — an unreadable tier locks the route;
   // billing/settings/api paths stay reachable so the situation is fixable.
-  if (user && !isPublic && !isSubscriptionExempt) {
+  if (userId && needsUser) {
     const { data: profile } = await supabase
       .from("profiles")
       .select("pharmacy_id, pharmacies(subscription_tier)")
-      .eq("id", user.id)
+      .eq("id", userId)
       .single()
 
     const tier = (

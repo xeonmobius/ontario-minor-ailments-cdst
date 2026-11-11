@@ -1,10 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 
-// The pay-to-use gate lives in the auth middleware: an authenticated user
-// whose pharmacy is not tier 'pro' gets redirected to the billing page, and
-// the exemption list (billing/profile/pharmacy/password settings, invites,
-// api) stays reachable so lockout is always fixable. Fails closed.
-
 vi.mock("@supabase/ssr", () => ({
   createServerClient: vi.fn(),
 }))
@@ -12,14 +7,30 @@ vi.mock("@supabase/ssr", () => ({
 import { createServerClient } from "@supabase/ssr"
 import { updateSession } from "@/lib/supabase/proxy"
 
-function makeRequest(path: string) {
+// The pay-to-use gate lives in the auth middleware: an authenticated user
+// whose pharmacy is not tier 'pro' gets redirected to the billing page, and
+// the exemption list (billing/profile/pharmacy/password settings, invites,
+// api) stays reachable so lockout is always fixable. Fails closed.
+// The user id is decoded from the session JWT cookie locally (no GoTrue
+// round trip), so tests drive authentication via a forged-shaped JWT cookie.
+
+function makeJwt(sub: string | null): string {
+  const b64 = (o: unknown) =>
+    Buffer.from(JSON.stringify(o)).toString("base64url")
+  const payload = sub
+    ? { sub, exp: Math.floor(Date.now() / 1000) + 3600 }
+    : { exp: Math.floor(Date.now() / 1000) - 10 }
+  return `${b64({ alg: "HS256" })}.${b64(payload)}.sig`
+}
+
+function makeRequest(path: string, sub: string | null) {
   // NextUrl is a URL subclass with a clone(); a plain URL + clone matches it.
   const nextUrl = new URL(`https://cdst.test${path}`)
   ;(nextUrl as URL & { clone: () => URL }).clone = () =>
     new URL(`https://cdst.test${path}`)
-  const cookies: { name: string; value: string }[] = [
-    { name: "sb-token", value: "t" },
-  ]
+  const cookies = sub
+    ? [{ name: "sb-hawlgrpgnfsqjqhhgmfi-auth-token", value: makeJwt(sub) }]
+    : []
   return {
     nextUrl,
     cookies: {
@@ -29,11 +40,8 @@ function makeRequest(path: string) {
   } as never
 }
 
-function mockSupabase(opts: { user: unknown; tier?: string }) {
+function mockSupabase(opts: { tier?: string }) {
   const fake = {
-    auth: {
-      getUser: vi.fn().mockResolvedValue({ data: { user: opts.user } }),
-    },
     from(table: string) {
       if (table !== "profiles") throw new Error(`unexpected table ${table}`)
       return {
@@ -43,12 +51,10 @@ function mockSupabase(opts: { user: unknown; tier?: string }) {
               return {
                 single() {
                   return Promise.resolve({
-                    data: opts.user
-                      ? {
-                          pharmacy_id: "ph_1",
-                          pharmacies: { subscription_tier: opts.tier ?? "basic" },
-                        }
-                      : null,
+                    data: {
+                      pharmacy_id: "ph_1",
+                      pharmacies: { subscription_tier: opts.tier ?? "basic" },
+                    },
                     error: null,
                   })
                 },
@@ -72,64 +78,70 @@ function locationOf(response: Response): string | null {
 
 describe("subscription gate in updateSession", () => {
   it("a pro pharmacy passes through to clinical routes", async () => {
-    mockSupabase({ user: { id: "u1" }, tier: "pro" })
-    const response = await updateSession(makeRequest("/assess/acne"))
+    mockSupabase({ tier: "pro" })
+    const response = await updateSession(makeRequest("/assess/acne", "u1"))
     expect(locationOf(response)).toBeNull()
   })
 
   it("a basic (unsubscribed) pharmacy is redirected to the billing page", async () => {
-    mockSupabase({ user: { id: "u1" }, tier: "basic" })
-    const response = await updateSession(makeRequest("/dashboard"))
+    mockSupabase({ tier: "basic" })
+    const response = await updateSession(makeRequest("/dashboard", "u1"))
     expect(locationOf(response)).toBe("https://cdst.test/settings/billing")
   })
 
   it("an unreadable tier fails closed to the billing page", async () => {
-    mockSupabase({ user: { id: "u1" }, tier: undefined })
-    const response = await updateSession(makeRequest("/assess/uti"))
+    mockSupabase({ tier: undefined })
+    const response = await updateSession(makeRequest("/assess/uti", "u1"))
     expect(locationOf(response)).toBe("https://cdst.test/settings/billing")
   })
 
+  it("an expired session token is treated as unauthenticated", async () => {
+    mockSupabase({ tier: "basic" })
+    const response = await updateSession(makeRequest("/dashboard", null))
+    expect(locationOf(response)).toBe("https://cdst.test/login")
+  })
+
   it("the billing page itself stays reachable when locked out", async () => {
-    mockSupabase({ user: { id: "u1" }, tier: "basic" })
-    const response = await updateSession(makeRequest("/settings/billing"))
+    mockSupabase({ tier: "basic" })
+    const response = await updateSession(makeRequest("/settings/billing", "u1"))
     expect(locationOf(response)).toBeNull()
   })
 
   it("profile and pharmacy settings stay reachable when locked out", async () => {
-    mockSupabase({ user: { id: "u1" }, tier: "basic" })
-    expect(locationOf(await updateSession(makeRequest("/settings/profile")))).toBeNull()
-    expect(locationOf(await updateSession(makeRequest("/settings/pharmacy")))).toBeNull()
+    mockSupabase({ tier: "basic" })
+    expect(locationOf(await updateSession(makeRequest("/settings/profile", "u1")))).toBeNull()
+    expect(locationOf(await updateSession(makeRequest("/settings/pharmacy", "u1")))).toBeNull()
   })
 
   it("api routes stay reachable (webhooks, checkout, portal)", async () => {
-    mockSupabase({ user: { id: "u1" }, tier: "basic" })
-    expect(locationOf(await updateSession(makeRequest("/api/polar/checkout")))).toBeNull()
-    expect(locationOf(await updateSession(makeRequest("/api/webhooks/polar")))).toBeNull()
+    mockSupabase({ tier: "basic" })
+    expect(locationOf(await updateSession(makeRequest("/api/polar/checkout", "u1")))).toBeNull()
+    expect(locationOf(await updateSession(makeRequest("/api/webhooks/polar", "u1")))).toBeNull()
   })
 
   it("invite acceptance stays reachable when locked out", async () => {
-    mockSupabase({ user: { id: "u1" }, tier: "basic" })
+    mockSupabase({ tier: "basic" })
     const response = await updateSession(
-      makeRequest("/invite/some-token/accept"),
+      makeRequest("/invite/some-token/accept", "u1"),
     )
     expect(locationOf(response)).toBeNull()
   })
 
   it("team settings require pro", async () => {
-    mockSupabase({ user: { id: "u1" }, tier: "basic" })
-    const response = await updateSession(makeRequest("/settings/team"))
+    mockSupabase({ tier: "basic" })
+    const response = await updateSession(makeRequest("/settings/team", "u1"))
     expect(locationOf(response)).toBe("https://cdst.test/settings/billing")
   })
 
   it("unauthenticated users still land on login (existing behavior)", async () => {
-    mockSupabase({ user: null })
-    const response = await updateSession(makeRequest("/dashboard"))
+    mockSupabase({ tier: "basic" })
+    const response = await updateSession(makeRequest("/dashboard", null))
     expect(locationOf(response)).toBe("https://cdst.test/login")
   })
 
   it("unauthenticated users reach public pages untouched", async () => {
-    mockSupabase({ user: null })
-    expect(locationOf(await updateSession(makeRequest("/login")))).toBeNull()
-    expect(locationOf(await updateSession(makeRequest("/signup")))).toBeNull()
+    mockSupabase({ tier: "basic" })
+    expect(locationOf(await updateSession(makeRequest("/login", null)))).toBeNull()
+    expect(locationOf(await updateSession(makeRequest("/signup", null)))).toBeNull()
   })
 })

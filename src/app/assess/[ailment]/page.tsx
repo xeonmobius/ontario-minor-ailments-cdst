@@ -22,11 +22,16 @@ export default async function AssessPage({
 
   const supabase = await createClient()
 
-  const { data: pharmacy } = await supabase
-    .from("pharmacies")
-    .select("name, address, city, province, postal_code, phone, fax, accreditation_number")
-    .eq("id", profile.pharmacyId)
-    .single()
+  // Pharmacy row and signature credential are independent — fetch in
+  // parallel (each is a network round trip to Supabase).
+  const [{ data: pharmacy }, enrolledSignature] = await Promise.all([
+    supabase
+      .from("pharmacies")
+      .select("name, address, city, province, postal_code, phone, fax, accreditation_number")
+      .eq("id", profile.pharmacyId)
+      .single(),
+    getSignatureAction(),
+  ])
 
   const pharmacyDefaults: PharmacyDefaults | null = pharmacy
     ? {
@@ -42,11 +47,6 @@ export default async function AssessPage({
         registrationNumber: pharmacy.accreditation_number ?? "",
       }
     : null
-
-  // Pharmacist e-signature credential (roadmap #11). Phase-1 no-op stub returns
-  // null; the panel then offers a one-time inline capture. The pharmacist
-  // identity is already bound to the authenticated profile (§2.2).
-  const enrolledSignature = await getSignatureAction()
 
   return (
     <PageShell>
