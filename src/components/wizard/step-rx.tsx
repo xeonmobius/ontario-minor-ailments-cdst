@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Checkbox } from "@/components/ui/checkbox"
 import { NonPrescribePanel } from "./non-prescribe-panel"
-import { CitationPanel } from "./citation-panel"
 
 function formatRecallDate(iso: string): string {
   const d = new Date(iso)
@@ -86,7 +85,6 @@ export function StepRx({
             )
           })}
         </div>
-        <CitationPanel slug={ailment.slug} step="rxSelection" />
       </div>
 
       {selectedRx && (
@@ -189,9 +187,6 @@ export function StepRx({
       <div>
         <h3 className="text-lg font-semibold mb-2">Follow-up</h3>
         <p className="text-sm text-muted-foreground">{ailment.followUp}</p>
-        <div className="mt-3">
-          <CitationPanel slug={ailment.slug} step="followUp" />
-        </div>
       </div>
 
       {onNonPrescribeReasonChange && onNonPrescribeRationaleChange && (

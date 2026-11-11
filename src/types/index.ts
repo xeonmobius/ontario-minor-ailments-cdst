@@ -15,55 +15,6 @@ export interface Ailment {
   followUp: string
 }
 
-export type DifferentialDisposition = "treat_in_tool" | "refer" | "otc_only"
-
-export interface Differential {
-  name: string
-  distinguishingFeatures: string
-  disposition: DifferentialDisposition
-}
-
-export interface DermNetLink {
-  label: string
-  url: string
-  topic: string
-}
-
-export interface DifferentialEntry {
-  differentials: Differential[]
-  dermnetLinks: DermNetLink[]
-  clinicalPearls?: string[]
-}
-
-export type CitationType =
-  | "guideline"
-  | "study"
-  | "systematic-review"
-  | "regulatory"
-  | "monograph"
-
-export type ProtocolStep =
-  | "redFlagScreening"
-  | "rxSelection"
-  | "nonRxAdvice"
-  | "followUp"
-
-export interface Citation {
-  id: string
-  source: string
-  type: CitationType
-  year?: number
-  url?: string
-  doi?: string
-  summary?: string
-}
-
-export interface AilmentCitations {
-  regulatory: Citation[]
-  primary: Citation[]
-  byStep?: Partial<Record<ProtocolStep, Citation[]>>
-}
-
 export interface PatientInfo {
   name: string
   dob: string

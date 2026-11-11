@@ -1,8 +1,8 @@
 ## Implementation progress
 - [x] #2 persist-assessments-flyio (DONE — src/lib/phi/, wizard save wired; fly.io host dropped 2026-11-03, persistence env-gated and dormant)
 - [x] #4 refusal-non-prescribe-docs (DONE 2026-06-24 — gnhf 1)
-- [x] #6 differential-diagnosis-dermnet (DONE 2026-06-24 — gnhf 1)
-- [x] #9 evidence-citations (DONE 2026-06-24 — gnhf 2)
+- [x] #6 differential-diagnosis-dermnet (BUILT 2026-06-24 gnhf 1 → REMOVED 2026-11-10 — wrong move per product owner; panels, content modules, types, PDF references section all deleted)
+- [x] #9 evidence-citations (BUILT 2026-06-24 gnhf 2 → REMOVED 2026-11-10 — wrong move per product owner; CitationPanel on red-flags/Rx steps, PDF references, modules, types all deleted)
 - [x] #12 smart-sig-autosuggest (DONE 2026-06-25 — gnhf 3)
 - [x] #24 multilingual-patient-instructions (DONE 2026-06-25 — gnhf 4)
 - [x] #5 stop-duplicating-pms-data (DONE 2026-06-25 — gnhf 5)

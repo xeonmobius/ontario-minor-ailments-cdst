@@ -10,7 +10,6 @@ import {
 } from "@react-pdf/renderer"
 import { Ailment, PatientInfo, PharmacyDefaults, SelectedRx, SignerRelationship, CaptureMethod } from "@/types"
 import { filterCheckedItems } from "@/lib/pdf-filter"
-import { ReferencesSection } from "./wizard/pdf-references"
 
 const TEAL = "#1a6b6b"
 const TEAL_LIGHT = "#e6f2f2"
@@ -355,8 +354,6 @@ export function CombinedPdf({
             <Text style={styles.signatureLabel}>{consentSignerName || "__________"}</Text>
           </View>
         </View>
-
-        <ReferencesSection slug={ailment.slug} />
 
         <View style={styles.footerDivider} />
         <View style={styles.phipaBox}>

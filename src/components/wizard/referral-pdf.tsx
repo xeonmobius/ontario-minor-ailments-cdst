@@ -9,7 +9,6 @@ import {
   StyleSheet,
 } from "@react-pdf/renderer"
 import { Ailment, PatientInfo, PharmacyDefaults, SignerRelationship, CaptureMethod } from "@/types"
-import { ReferencesSection } from "./pdf-references"
 
 const TEAL = "#1a6b6b"
 const TEAL_LIGHT = "#e6f2f2"
@@ -299,8 +298,6 @@ export function ReferralPdf({
             <Text style={styles.signatureLabel}>{consentSignerName || "__________"}</Text>
           </View>
         </View>
-
-        <ReferencesSection slug={ailment.slug} />
 
         <View style={styles.footerDivider} />
         <View style={styles.phipaBox}>
