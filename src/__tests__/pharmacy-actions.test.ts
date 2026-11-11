@@ -86,7 +86,7 @@ describe("addPharmacy — pay-to-use defaults", () => {
   it("creates the pharmacy with no per-user tier cap", async () => {
     const { supabase } = mockSupabase({})
 
-    await addPharmacy(undefined, buildForm())
+    await addPharmacy(null, buildForm())
 
     expect(supabase.from).toHaveBeenCalledWith("pharmacies")
     expect(redirect).toHaveBeenCalledWith("/")
@@ -95,7 +95,7 @@ describe("addPharmacy — pay-to-use defaults", () => {
   it("starts new pharmacies locked: status inactive, tier basic", async () => {
     const { pharmaciesInsert } = mockSupabase({})
 
-    await addPharmacy(undefined, buildForm())
+    await addPharmacy(null, buildForm())
 
     const payload = pharmaciesInsert.mock.calls[0]?.[0] as Record<string, unknown>
     expect(payload.subscription_status).toBe("inactive")
@@ -105,7 +105,7 @@ describe("addPharmacy — pay-to-use defaults", () => {
   it("ignores client-supplied tier in formData", async () => {
     const { pharmaciesInsert } = mockSupabase({})
 
-    await addPharmacy(undefined, buildForm({ tier: "enterprise" }))
+    await addPharmacy(null, buildForm({ tier: "enterprise" }))
 
     const payload = pharmaciesInsert.mock.calls[0]?.[0] as Record<string, unknown>
     expect(payload.subscription_tier).toBe("basic")
@@ -114,7 +114,7 @@ describe("addPharmacy — pay-to-use defaults", () => {
   it("surfaces a failure to create the pharmacy row", async () => {
     mockSupabase({ insertError: "Failed to create pharmacy." })
 
-    const result = await addPharmacy(undefined, buildForm())
+    const result = await addPharmacy(null, buildForm())
 
     expect(result).toHaveProperty("error")
   })
@@ -122,7 +122,7 @@ describe("addPharmacy — pay-to-use defaults", () => {
   it("rejects unauthenticated callers", async () => {
     mockSupabase({ unauth: true })
 
-    const result = await addPharmacy(undefined, buildForm())
+    const result = await addPharmacy(null, buildForm())
 
     expect(result).toEqual({ error: "Not authenticated" })
   })

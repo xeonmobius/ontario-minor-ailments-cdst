@@ -20,10 +20,10 @@ export default async function TeamPage() {
     .eq("pharmacy_id", profile.pharmacyId)
     .is("accepted_at", null)
 
-  const flatMembers = (members ?? []).map((m: any) => ({
+  const flatMembers = (members ?? []).map((m: { id: string; role: string; profiles: { full_name: string | null; email: string | null }[] }) => ({
     id: m.id,
-    full_name: m.profiles?.full_name ?? "—",
-    email: m.profiles?.email ?? "—",
+    full_name: m.profiles?.[0]?.full_name ?? "—",
+    email: m.profiles?.[0]?.email ?? "—",
     role: m.role,
   }))
 

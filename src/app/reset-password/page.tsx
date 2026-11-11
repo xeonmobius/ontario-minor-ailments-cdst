@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { useActionState } from "react"
 import Link from "next/link"
 import { resetPassword } from "@/lib/auth-actions"
+import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,10 +17,14 @@ export default function ResetPasswordPage() {
   const [hasSession, setHasSession] = useState(false)
   const success = (state as ActionState | null)?.success
 
+  // Verify the recovery session instead of trusting the URL fragment (audit
+  // finding 15): the hash alone proves nothing — a valid session proves the
+  // user arrived through a real reset link. Async, so no sync-setState.
   useEffect(() => {
-    if (typeof window !== "undefined" && window.location.hash) {
-      setHasSession(true)
-    }
+    const supabase = createClient()
+    supabase.auth.getSession().then(({ data }) => {
+      setHasSession(Boolean(data.session))
+    })
   }, [])
 
   if (success) {

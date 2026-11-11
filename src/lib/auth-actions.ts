@@ -4,8 +4,9 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { logAuditEvent } from "@/lib/audit-actions"
+import type { ActionState } from "@/lib/action-state"
 
-export async function login(_prev: any, formData: FormData) {
+export async function login(_prev: ActionState | null, formData: FormData) {
   const supabase = await createClient()
   const email = formData.get("email") as string
   const password = formData.get("password") as string
@@ -22,7 +23,7 @@ export async function login(_prev: any, formData: FormData) {
   redirect("/")
 }
 
-export async function signup(_prev: any, formData: FormData) {
+export async function signup(_prev: ActionState | null, formData: FormData) {
   const supabase = await createClient()
   const email = formData.get("email") as string
   const password = formData.get("password") as string
@@ -231,7 +232,7 @@ export async function createInvitation(formData: FormData) {
   return { success: true }
 }
 
-export async function forgotPassword(_prev: any, formData: FormData) {
+export async function forgotPassword(_prev: ActionState | null, formData: FormData) {
   const supabase = await createClient()
   const email = formData.get("email") as string
 
@@ -242,7 +243,7 @@ export async function forgotPassword(_prev: any, formData: FormData) {
   return { success: true }
 }
 
-export async function resetPassword(_prev: any, formData: FormData) {
+export async function resetPassword(_prev: ActionState | null, formData: FormData) {
   const password = formData.get("password") as string
   const confirmPassword = formData.get("confirmPassword") as string
 
@@ -265,7 +266,7 @@ export async function resetPassword(_prev: any, formData: FormData) {
   return { success: true }
 }
 
-export async function changePassword(_prev: any, formData: FormData) {
+export async function changePassword(_prev: ActionState | null, formData: FormData) {
   const currentPassword = formData.get("currentPassword") as string
   const password = formData.get("password") as string
   const confirmPassword = formData.get("confirmPassword") as string
@@ -304,7 +305,7 @@ export async function changePassword(_prev: any, formData: FormData) {
   return { success: true }
 }
 
-export async function changeEmail(_prev: any, formData: FormData) {
+export async function changeEmail(_prev: ActionState | null, formData: FormData) {
   const email = formData.get("email") as string
   const currentPassword = formData.get("currentPassword") as string
 

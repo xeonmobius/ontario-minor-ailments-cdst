@@ -5,6 +5,7 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { logAuditEvent } from "@/lib/audit-actions"
 import type { PharmacyMember } from "@/types"
+import type { ActionState } from "@/lib/action-state"
 
 // Tier lives per-pharmacy now (ADR 0001) — profiles.subscription_tier and
 // this old per-user limit table are retired. Pharmacy creation is free;
@@ -21,14 +22,14 @@ export async function getUserPharmacies(): Promise<PharmacyMember[]> {
     .eq("user_id", user.id)
     .eq("is_active", true)
 
-  return (data ?? []).map((row: any) => ({
+  return (data ?? []).map((row: { id: string; user_id: string; pharmacy_id: string; role: string; is_active: boolean; created_at: string; pharmacies: unknown }) => ({
     id: row.id,
     userId: row.user_id,
     pharmacyId: row.pharmacy_id,
-    role: row.role,
+    role: row.role as PharmacyMember["role"],
     isActive: row.is_active,
     createdAt: row.created_at,
-    pharmacyName: row.pharmacies?.name,
+    pharmacyName: (row.pharmacies as { name?: string } | null)?.name,
   }))
 }
 
@@ -59,7 +60,7 @@ export async function switchPharmacy(pharmacyId: string) {
   redirect("/")
 }
 
-export async function addPharmacy(_prev: any, formData: FormData) {
+export async function addPharmacy(_prev: ActionState | null, formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: "Not authenticated" }
