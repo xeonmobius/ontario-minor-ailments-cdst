@@ -90,7 +90,16 @@ export async function updateSession(request: NextRequest) {
     SUBSCRIPTION_EXEMPT_PATHS.some((p) => path === p || path.startsWith(p + "/"))
 
   const needsUser = !isPublic && !isSubscriptionExempt
-  const userId = needsUser ? decodeSessionSub(request) : null
+  let userId = needsUser ? decodeSessionSub(request) : null
+
+  // Fallback: a missing/expired access token may still have a valid refresh
+  // token. getUser() performs the refresh and rewrites the session cookies
+  // (via the setAll above) — the old pre-fast-path behavior. Only the rare
+  // expired/chunked-cookie case pays this round trip.
+  if (needsUser && !userId) {
+    const { data: { user } } = await supabase.auth.getUser()
+    userId = user?.id ?? null
+  }
 
   if (!userId && needsUser) {
     const url = request.nextUrl.clone()

@@ -40,8 +40,14 @@ function makeRequest(path: string, sub: string | null) {
   } as never
 }
 
-function mockSupabase(opts: { tier?: string }) {
+function mockSupabase(opts: { tier?: string; refreshUser?: string | null }) {
   const fake = {
+    auth: {
+      // getUser fallback: expired/malformed local token → GoTrue refresh path.
+      getUser: vi.fn().mockResolvedValue({
+        data: { user: opts.refreshUser ? { id: opts.refreshUser } : null },
+      }),
+    },
     from(table: string) {
       if (table !== "profiles") throw new Error(`unexpected table ${table}`)
       return {
@@ -95,10 +101,19 @@ describe("subscription gate in updateSession", () => {
     expect(locationOf(response)).toBe("https://cdst.test/settings/billing")
   })
 
-  it("an expired session token is treated as unauthenticated", async () => {
-    mockSupabase({ tier: "basic" })
+  it("an expired token with no refreshable session lands on login", async () => {
+    mockSupabase({ tier: "basic", refreshUser: null })
     const response = await updateSession(makeRequest("/dashboard", null))
     expect(locationOf(response)).toBe("https://cdst.test/login")
+  })
+
+  it("an expired token with a refreshable session is refreshed and passes", async () => {
+    // The bug this guards against: expired access token used to bounce users
+    // to /login before the refresh token could do its job (2026-11-11 login
+    // outage). The getUser fallback refreshes and admits them.
+    mockSupabase({ tier: "pro", refreshUser: "u-refreshed" })
+    const response = await updateSession(makeRequest("/dashboard", null))
+    expect(locationOf(response)).toBeNull()
   })
 
   it("the billing page itself stays reachable when locked out", async () => {
